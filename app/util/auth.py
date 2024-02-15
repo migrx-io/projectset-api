@@ -28,7 +28,7 @@ def authenticate(username, password, user_data):
 def auth_call(login, password, user_data):
 
     # Auth logic here
-    status, text = 200, {"session": ""}
+    status, data = 200, {"session": ""}
 
     return status, data
 

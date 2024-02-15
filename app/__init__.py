@@ -20,7 +20,6 @@ from app.util.workers import run_worker
 
 import os
 
-
 app = Flask(__name__)
 
 log.basicConfig(

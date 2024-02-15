@@ -28,7 +28,7 @@ def authz():
 
     log.debug("user_data: %s", user_data)
 
-    is_auth, auth_data = authenticate( username, password, user_data)
+    is_auth, auth_data = authenticate(username, password, user_data)
 
     log.debug("is_auth: %s / auth_data: %s", is_auth, auth_data)
 
