@@ -1,0 +1,35 @@
+Get clusters list
+Get clusters list
+---
+tags:
+  - Cluster
+
+produces:
+  - application/json
+
+responses:
+  200:
+    description: "Clusters list"
+    schema:
+
+      type: array
+      items:
+        type: object
+        properties:
+          cluster:
+            type: string
+            description: Cluster name
+      example:
+        [{'cluster': 'main'}]
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}

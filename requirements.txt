@@ -1,0 +1,5 @@
+flasgger==0.9.7.1
+Flask==3.0.2
+Flask-JWT-Extended==4.6.0
+gevent==24.2.1
+uWSGI==2.0.24

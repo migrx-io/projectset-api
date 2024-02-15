@@ -1,0 +1,30 @@
+Logout
+Logout
+---
+tags:
+  - Auth
+
+produces:
+  - application/json
+consumes:
+  - application/json
+
+
+responses:
+  200:
+    description: "Logout result"
+    schema:
+      example:
+          "ok"
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}

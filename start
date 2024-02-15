@@ -1,0 +1,12 @@
+#!/bin/bash
+
+HTTP_OPTS="--http 0.0.0.0:${PORT}"
+
+SSL_CRT="/etc/ssl/projectset-api/projectset-api.crt"
+SSL_KEY="/etc/ssl/projectset-api/projectset-api.key"
+
+if [ -f ${SSL_CRT}  ]; then
+    HTTP_OPTS="--https 0.0.0.0:${PORT},${SSL_CRT},${SSL_KEY},HIGH"
+fi
+
+exec ${PYENV}/uwsgi --ini uwsgi.ini ${HTTP_OPTS}

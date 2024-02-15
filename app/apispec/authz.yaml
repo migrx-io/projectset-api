@@ -1,0 +1,54 @@
+Auth to cluster
+Auth to cluster
+---
+tags:
+  - Auth
+
+produces:
+  - application/json
+consumes:
+  - application/json
+
+parameters:
+  - in: body
+    name: request
+    description: "Auth data username and password"
+    required: true
+    schema:
+
+      properties:
+        username:
+          type: string
+          description: User login
+        password:
+          type: string
+          description: User password
+
+      example:
+        {"username": "user",
+         "password": "password"}
+
+responses:
+  200:
+    description: "Auth data with token and session"
+    schema:
+
+      properties:
+        access_token:
+          type: string
+          description: JWT Token
+
+      example:
+          {"access_token": "base64 jwt token"}
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}
