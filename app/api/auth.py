@@ -23,7 +23,6 @@ def authz():
     user_data = {
         "user-agent": request.headers.get('user-agent'),
         "user-ip": request.remote_addr,
-        "session_token": data.get("session_token")
     }
 
     log.debug("user_data: %s", user_data)
@@ -41,7 +40,6 @@ def authz():
         resp_code = 200
 
     additional_claims = {
-        "session": auth_data.get("session"),
         "login": username,
     }
 
@@ -49,10 +47,7 @@ def authz():
     access_token = create_access_token(identity=username,
                                        additional_claims=additional_claims)
 
-    return jsonify(
-        session_token=additional_claims.get("session"),
-        access_token=access_token,
-    ), resp_code
+    return jsonify(access_token=access_token, ), resp_code
 
 
 @auth.route('/auth/logout', methods=['POST'])

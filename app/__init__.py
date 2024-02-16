@@ -28,7 +28,7 @@ log.basicConfig(
 )
 
 app.config['JWT_SECRET_KEY'] = os.environ["JWT_SECRET_KEY"]
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = os.environ["JWT_EXP"]
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(os.environ["JWT_EXP"])
 app.config['JWT_HEADER_TYPE'] = os.environ["JWT_HEADER"]
 
 swag_conf = {
