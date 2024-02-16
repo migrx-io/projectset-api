@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ProjectSet Service</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/bootstrap.min.css") }}" >
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/dataTables.bootstrap5.css") }}">
+
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/jquery-3.6.0.min.js") }}"></script>
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/bootstrap.min.js") }}"></script>
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/popper.min.js") }}"></script>
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/jquery.dataTables.js") }}"></script>
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/dataTables.bootstrap5.js") }}"></script>
+
+
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('repoz.index') }}">Enviroments</a>
+            </li>
+        </ul>
+        </div>
+    </div>
+    </nav>
+
+    <hr>
+
+    <div class="container-fluid">                                                        
+      {% block content %}{% endblock %}                                            
+    </div>     
+
+     {% block scripts %}
+      <script>
+        $(document).ready(function () {
+
+        $('.table').DataTable();
+
+        $('.refresh-button').click(function () {
+           location.reload();
+        });
+
+        $('.edit-modal-opener').click(function () {
+                var url = $(this).data('whatever');
+                $.get(url, function (data) {
+                    $('#Modal .modal-content').html(data);
+                    $('#Modal').modal();
+                    $('#submit').click(function (event) {
+                        event.preventDefault();
+                        $.post(url, data = $('#ModalForm').serialize(), function (
+                            data) {
+                            if (data.status == 'ok') {
+                                $('#Modal').modal('hide');
+                                location.reload();
+                            } else {
+                                $("#modal-error-text").text("ERROR: " + data.error);
+                            }
+                        })
+                    });
+                })
+            });
+
+        });
+     </script>
+    {% endblock %}
+ 
+    <!-- Dynamic Modal -->
+    <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="FormModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <!-- load content here -->
+            </div>
+        </div>
+    </div>
+    <!-- End Dynamic Modal -->
+    <hr>
+    <footer><footer>&copy; migrx.io. Enviroment as a Service</footer>
+    <br>
+    </html>
