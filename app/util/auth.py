@@ -12,7 +12,7 @@ def authenticate(username, password, user_data):
 
     # if user admin - all perms
     if username == "admin" and password == os.environ["ADMIN_PASSWD"] and \
-            os.environ["ADMIN_DISABLE"] == "n":
+            os.environ.get("ADMIN_DISABLE", "n") == "n":
         return AuthCodes.YES, {"session": ""}
 
     status, data = auth_call(username, password, user_data)
@@ -67,7 +67,7 @@ def token_required(fn):
     def wrapper(*args, **kwargs):
         api_key = request.headers.get('X-API-KEY')
 
-        if api_key != os.environ["X_API_KEY"]:
+        if api_key != os.environ.get("X_API_KEY"):
             raise Exception("A valid API KEY is missing")
 
         return fn(*args, **kwargs)

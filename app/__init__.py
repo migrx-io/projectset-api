@@ -5,6 +5,8 @@ monkey.patch_all()
 import logging as log
 import sys
 import os
+import random
+import string
 
 from flask import Flask
 from flask_jwt_extended import JWTManager
@@ -27,9 +29,11 @@ log.basicConfig(
     format='[%(asctime)s] [%(threadName)s] %(levelname)s - %(message)s',
 )
 
-app.config['JWT_SECRET_KEY'] = os.environ["JWT_SECRET_KEY"]
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(os.environ["JWT_EXP"])
-app.config['JWT_HEADER_TYPE'] = os.environ["JWT_HEADER"]
+app.config['JWT_SECRET_KEY'] = "".join(
+    random.choices(string.ascii_lowercase + string.digits, k=20))
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(
+    os.environ.get("JWT_EXP", "31536000"))
+app.config['JWT_HEADER_TYPE'] = os.environ.get("JWT_HEADER", "JWT")
 
 swag_conf = {
     "swagger": "2.0",
@@ -85,7 +89,7 @@ with app.app_context():
 
     # Gateway worker
     # q = queue.Queue()
-    pool = Pool(int(os.environ["PWORKERS"]), run_worker, {})
+    pool = Pool(int(os.environ.get("PWORKERS", "1")), run_worker, {})
     pool.start()
 
 # Register blueprint(s)
