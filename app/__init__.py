@@ -109,9 +109,9 @@ app.register_blueprint(auth, url_prefix='/api/v1/')
 app.register_blueprint(clstr, url_prefix='/api/v1/')
 
 # Webapp
-app.register_blueprint(repo_page, url_prefix='/')
+app.register_blueprint(login_page, url_prefix='/')
+app.register_blueprint(repo_page, url_prefix='/repo')
 app.register_blueprint(ps_page, url_prefix='/ps')
-app.register_blueprint(login_page, url_prefix='/login')
 
 # Common errors
 app.register_error_handler(500, handle_internal_error)
