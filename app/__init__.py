@@ -21,7 +21,10 @@ from app.util.errors import handle_internal_error
 from app.util.pool import Pool
 from app.util.workers import run_worker
 
-app = Flask(__name__)
+app = Flask(__name__,
+            template_folder="webapp/html/templates",
+            static_folder="webapp/html/static"),
+)
 
 log.basicConfig(
     stream=sys.stdout,
@@ -99,6 +102,13 @@ app.register_blueprint(auth, url_prefix='/api/v1/')
 
 # Cluster
 app.register_blueprint(clstr, url_prefix='/api/v1/')
+
+
+
+# Webapp
+app.register_blueprint(wizard, url_prefix='/')
+app.register_blueprint(projectset, url_prefix='/ps')
+app.register_blueprint(projectsettemplate, url_prefix='/pst')
 
 # Common errors
 app.register_error_handler(500, handle_internal_error)
