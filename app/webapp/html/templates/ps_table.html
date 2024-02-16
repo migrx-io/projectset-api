@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>ProjectSet CRDs</h2>
+<button class="edit-modal-opener btn btn-success" 
+   data-toggle="modal"
+   data-whatever="{{ url_for('ps_page.create') }}" href="#">Create instance</button>
+<button class="edit-modal-opener btn btn-danger" 
+   data-toggle="modal"
+   data-whatever="{{ url_for('ps_page.delete') }}" href="#">Delete instance</button>
+<button class="refresh-button btn btn-light" href="#">Refresh</button>
+<hr>
+<div class="container-fluid">
+  <table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>name</th>
+        <th>labels</th>
+        <th>annotations</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in ps %}
+          <td>{{ i.name }}</td>
+          <td>{{ i.labels }}</td>
+          <td>{{ i.annotations }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% endblock %}
