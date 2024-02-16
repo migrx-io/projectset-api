@@ -37,18 +37,6 @@ def auth_call(login, password, user_data):
     return status, data
 
 
-def check_logout(login, claims, req):
-
-    # Logout logic here
-
-    log.debug("check_logout: login: %s / claims: %s / req: %s", login, claims,
-              req)
-
-    # return False, data
-
-    return True, "ok"
-
-
 def check_permissions(login, claims, req):
 
     # check user permission
@@ -61,24 +49,22 @@ def check_permissions(login, claims, req):
     return True, "ok"
 
 
-def token_required(fn):
-
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        api_key = request.headers.get('X-API-KEY')
-
-        if api_key != os.environ.get("X_API_KEY"):
-            raise Exception("A valid API KEY is missing")
-
-        return fn(*args, **kwargs)
-
-    return wrapper
-
-
 def jwt_required(fn):
 
     @wraps(fn)
     def wrapper(*args, **kwargs):
+
+        # check APIKEY if exists
+
+        api_key = request.headers.get('X-API-KEY')
+        if api_key is not None:
+
+            if api_key != os.environ.get("X_API_KEY"):
+                raise Exception("A valid API KEY is missing")
+
+            return fn(*args, **kwargs)
+
+        # verify JWT token
 
         verify_jwt_in_request()
 
@@ -96,16 +82,8 @@ def jwt_required(fn):
         # add context perm to func
         log.debug("kwargs data: %s", data)
 
-        response, _code = fn(*args, **kwargs)
+        response, code = fn(*args, **kwargs)
 
-        # err = None
-        # if code != 200:
-        #     err = response
-        # elif code == 200:
-        #     if isinstance(response,
-        #                   dict) and response.get("error") is not None:
-        #         err = response.get("error")
-
-        return response
+        return response, code
 
     return wrapper

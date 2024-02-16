@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import (create_access_token, verify_jwt_in_request,
-                                get_jwt_identity, get_jwt)
+from flask_jwt_extended import (create_access_token)
 import logging as log
-from app.util.auth import authenticate, check_logout
+from app.util.auth import authenticate
 from app.util.types import AuthCodes
 
 auth = Blueprint('auth', __name__)
@@ -48,23 +47,3 @@ def authz():
                                        additional_claims=additional_claims)
 
     return jsonify(access_token=access_token, ), resp_code
-
-
-@auth.route('/auth/logout', methods=['POST'])
-def authz_logout():
-    """
-    file: ../apispec/authz_logout.yaml
-    """
-    verify_jwt_in_request()
-
-    login = get_jwt_identity()
-    claims = get_jwt()
-    data = request.get_json()
-
-    is_checked, data = check_logout(login, claims, data)
-
-    log.debug("authz_logout: is_checked: %s / data: %s", is_checked, data)
-
-    if not is_checked:
-        return data, 503
-    return "ok", 200

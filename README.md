@@ -5,6 +5,7 @@
 
 ```
 export JWT_SECRET_KEY="secret"
+export X_API_KEY="secret_api"
 export JWT_EXP=31536000
 export JWT_HEADER="JWT"
 export ADMIN_DISABLE="n"
