@@ -1,10 +1,11 @@
+from functools import wraps
+import os
+import logging as log
+
 from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
                                 get_jwt)
 from flask import request, jsonify
-from functools import wraps
 from app.util.types import AuthCodes
-import logging as log
-import json
 
 
 def authenticate(username, password, user_data):
@@ -14,18 +15,21 @@ def authenticate(username, password, user_data):
             os.environ["ADMIN_DISABLE"] == "n":
         return AuthCodes.YES, {"session": ""}
 
-    status, text = auth_call(username, password, user_data)
+    status, data = auth_call(username, password, user_data)
 
-    log.debug("auth_call: status: %s / text %s", status, text)
+    log.debug("auth_call: status: %s / text %s", status, data)
 
     if status != 200:
-        log.error(text)
-        return AuthCodes.NO, text
+        log.error(data)
+        return AuthCodes.NO, data
 
     return AuthCodes.YES, data
 
 
 def auth_call(login, password, user_data):
+
+    log.debug("auth_call: login: %s / password %s / data: %s", login, password,
+              user_data)
 
     # Auth logic here
     status, data = 200, {"session": ""}
@@ -37,7 +41,8 @@ def check_logout(login, claims, req):
 
     # Logout logic here
 
-    log.debug("check_logout: login: %s / claims: %s", login, claims)
+    log.debug("check_logout: login: %s / claims: %s / req: %s", login, claims,
+              req)
 
     # return False, data
 
@@ -48,7 +53,8 @@ def check_permissions(login, claims, req):
 
     # check user permission
 
-    log.debug("check_permissions: login: %s / claims: %s", login, claims)
+    log.debug("check_permissions: login: %s / claims: %s / req: %s", login,
+              claims, req)
 
     # retunr False, data
 

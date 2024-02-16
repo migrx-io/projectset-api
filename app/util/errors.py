@@ -1,5 +1,5 @@
-from flask import jsonify
 import logging as log
+from flask import jsonify
 
 
 def handle_internal_error(e):

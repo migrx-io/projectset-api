@@ -1,6 +1,5 @@
-from flask import Blueprint, request, jsonify
-from app.util.auth import token_required, jwt_required
-from app.util.exec import run_shell
+from flask import Blueprint, jsonify
+from app.util.auth import jwt_required
 
 clstr = Blueprint('cluster', __name__)
 

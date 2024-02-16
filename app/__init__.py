@@ -2,6 +2,10 @@ from gevent import monkey
 
 monkey.patch_all()
 
+import logging as log
+import sys
+import os
+
 from flask import Flask
 from flask_jwt_extended import JWTManager
 
@@ -12,13 +16,8 @@ from app.api.cluster import clstr
 
 from app.util.errors import handle_internal_error
 
-import logging as log
-import sys
-
 from app.util.pool import Pool
 from app.util.workers import run_worker
-
-import os
 
 app = Flask(__name__)
 
