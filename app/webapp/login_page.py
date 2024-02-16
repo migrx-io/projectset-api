@@ -1,6 +1,8 @@
 from flask import (Blueprint, render_template, request, 
                    redirect, url_for, make_response)
 
+import logging as log
+
 login_page = Blueprint('login_page', __name__)
 
 
@@ -26,6 +28,8 @@ def login():
             error = 'Invalid Credentials. Please try again.'
             return render_template("login.html", error=error)
 
+        log.debug("make response..")
+
         response = make_response(render_template('repos.html'))
         # set jwt cookie
         response.set_cookie('access_token', 'super')
@@ -33,3 +37,15 @@ def login():
         return response
 
         # return redirect(url_for('repo_page.repo'))
+
+@login_page.route('/logout', methods=['GET', 'POST'])
+def logout():
+
+    # clear cookie
+
+    if request.method=='GET':
+        return redirect(url_for('login_page.login'))
+
+    response = make_response(render_template('login.html'))
+    response.set_cookie('access_token', '', expires=0)
+    return response
