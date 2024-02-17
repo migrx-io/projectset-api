@@ -1,5 +1,5 @@
-from flask import (Blueprint, render_template, request, 
-                   redirect, url_for, make_response)
+from flask import (Blueprint, render_template, request, redirect, url_for,
+                   make_response)
 
 import logging as log
 
@@ -11,32 +11,31 @@ def login():
 
     error = None
 
-    if request.method=='GET':
+    if request.method == 'GET':
 
         access_token = request.cookies.get('access_token')
 
         if access_token is None:
-            return render_template('login.html', error=error)
-        else:
-            return redirect(url_for('repo_page.repo'))
+            return render_template('login_page.html', error=error)
 
-    else:
-        email = request.form.get('email')
-        password = request.form.get('password')
+        return redirect(url_for('repo_page.repo'))
 
-        if email=="" and password=="":
-            error = 'Invalid Credentials. Please try again.'
-            return render_template("login.html", error=error)
+    # POST form
+    email = request.form.get('email')
+    password = request.form.get('password')
 
-        log.debug("make response..")
+    if email == "" and password == "":
+        error = 'Invalid Credentials. Please try again.'
+        return render_template("login_page.html", error=error)
 
-        response = make_response(redirect(url_for('repo_page.repo')))
-        # set jwt cookie
-        response.set_cookie('access_token', 'super')
+    log.debug("make response..")
 
-        return response
+    response = make_response(redirect(url_for('repo_page.repo')))
+    # set jwt cookie
+    response.set_cookie('access_token', 'super')
 
-        # return redirect(url_for('repo_page.repo'))
+    return response
+
 
 @login_page.route('/logout', methods=['GET', 'POST'])
 def logout():

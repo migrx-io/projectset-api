@@ -1,7 +1,7 @@
 import logging as log
 
 
-def get_ps():
+def get_projectset():
 
     crds = []
 

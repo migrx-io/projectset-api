@@ -28,15 +28,15 @@
       </tr>
     </thead>
     <tbody>
-      {% for repo  in repos %}
-          <td>{{ repo.name }}</td>
-          <td>{{ repo.descr }}</td>
-          <td>{{ repo.giturl }}</td>
-          <td>{{ repo.env }}</td>
-          <td>{{ repo.ps_path }}</td>
-          <td>{{ repo.ps_count }}</td>
-          <td>{{ repo.pst_path }}</td>
-          <td>{{ repo.pst_count }}</td>
+      {% for e  in env_list %}
+          <td>{{ e.name }}</td>
+          <td>{{ e.descr }}</td>
+          <td>{{ e.giturl }}</td>
+          <td>{{ e.env }}</td>
+          <td>{{ e.ps_path }}</td>
+          <td>{{ e.ps_count }}</td>
+          <td>{{ e.pst_path }}</td>
+          <td>{{ e.pst_count }}</td>
         </tr>
       {% endfor %}
     </tbody>

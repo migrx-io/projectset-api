@@ -6,5 +6,5 @@ repo_page = Blueprint('repo_page', __name__)
 
 @repo_page.route('/', methods=['GET'])
 def repo():
-    repos = get_envs()
-    return render_template('repos.html', repos=repos)
+    env_list = get_envs()
+    return render_template('repo_page.html', env_list=env_list)
