@@ -30,7 +30,7 @@ def login():
 
         log.debug("make response..")
 
-        response = make_response(render_template('repos.html'))
+        response = make_response(redirect(url_for('repo_page.repo')))
         # set jwt cookie
         response.set_cookie('access_token', 'super')
 
@@ -41,11 +41,6 @@ def login():
 @login_page.route('/logout', methods=['GET', 'POST'])
 def logout():
 
-    # clear cookie
-
-    if request.method=='GET':
-        return redirect(url_for('login_page.login'))
-
-    response = make_response(render_template('login.html'))
+    response = make_response(redirect(url_for('login_page.login')))
     response.set_cookie('access_token', '', expires=0)
     return response
