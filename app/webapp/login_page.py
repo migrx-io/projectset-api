@@ -36,7 +36,7 @@ def login():
 
     log.debug("make response..")
 
-    response = make_response(redirect(url_for('repo_page.repo')))
+    response = make_response(redirect(url_for('projectset_page.projectset')))
     # set jwt cookie
     response.set_cookie('access_token_cookie', data)
 
