@@ -2,7 +2,7 @@ from flask import (Blueprint, render_template, request, redirect, url_for,
                    make_response)
 
 import logging as log
-from app.util.auth import authenticate
+from app.util.auth import authenticate, jwt_required
 
 login_page = Blueprint('login_page', __name__)
 
@@ -14,7 +14,11 @@ def login():
 
     if request.method == 'GET':
 
-        access_token = request.cookies.get('access_token')
+        if request.args.get('error'):
+            return render_template('login_page.html',
+                                   error=request.args.get("error"))
+
+        access_token = request.cookies.get('access_token_cookie')
 
         if access_token is None:
             return render_template('login_page.html', error=error)
@@ -34,14 +38,15 @@ def login():
 
     response = make_response(redirect(url_for('repo_page.repo')))
     # set jwt cookie
-    response.set_cookie('access_token', data)
+    response.set_cookie('access_token_cookie', data)
 
     return response
 
 
 @login_page.route('/logout', methods=['GET', 'POST'])
+@jwt_required(True)
 def logout():
 
     response = make_response(redirect(url_for('login_page.login')))
-    response.set_cookie('access_token', '', expires=0)
+    response.set_cookie('access_token_cookie', '', expires=0)
     return response

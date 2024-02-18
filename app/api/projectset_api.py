@@ -6,7 +6,7 @@ projectset_api = Blueprint('projectset_api', __name__)
 
 
 @projectset_api.route('/projectset', methods=['GET'])
-@jwt_required
+@jwt_required(False)
 def projectset():
     """
     file: ../apispec/projectset_list.yaml

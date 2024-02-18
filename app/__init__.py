@@ -42,6 +42,7 @@ app.config['JWT_SECRET_KEY'] = "".join(
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(
     os.environ.get("JWT_EXP", "31536000"))
 app.config['JWT_HEADER_TYPE'] = os.environ.get("JWT_HEADER", "JWT")
+app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 
 swag_conf = {
     "swagger": "2.0",

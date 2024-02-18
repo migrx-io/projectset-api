@@ -4,7 +4,7 @@ import logging as log
 
 from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
                                 get_jwt, create_access_token)
-from flask import request, jsonify
+from flask import request, jsonify, url_for, redirect
 
 
 def authenticate(username, password):
@@ -53,41 +53,49 @@ def check_permissions(login, claims, req):
     return True, None
 
 
-def jwt_required(fn):
+def jwt_required(page=False):
 
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
+    def jwt_required_root(fn):
 
-        # check APIKEY if exists
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
 
-        api_key = request.headers.get('X-API-KEY')
-        if api_key is not None:
+            # check APIKEY if exists
 
-            if api_key != os.environ.get("X_API_KEY"):
-                raise Exception("A valid API KEY is missing")
+            api_key = request.headers.get('X-API-KEY')
+            if api_key is not None:
 
-            return fn(*args, **kwargs)
+                if api_key != os.environ.get("X_API_KEY"):
+                    raise Exception("A valid API KEY is missing")
 
-        # verify JWT token
+                return fn(*args, **kwargs)
 
-        verify_jwt_in_request()
+            # verify JWT token
 
-        login = get_jwt_identity()
-        claims = get_jwt()
+            try:
+                verify_jwt_in_request()
 
-        is_checked, data = check_permissions(login, claims, request)
+                login = get_jwt_identity()
+                claims = get_jwt()
 
-        if login == "admin" and os.environ["ADMIN_DISABLE"] == "n":
-            return fn(*args, **kwargs)
+                is_checked, data = check_permissions(login, claims, request)
 
-        if not is_checked:
-            return jsonify(error=data), 403
+                if login == "admin" and os.environ["ADMIN_DISABLE"] == "n":
+                    return fn(*args, **kwargs)
 
-        # add context perm to func
-        log.debug("kwargs data: %s", data)
+                if not is_checked:
+                    return jsonify(error=data), 403
 
-        response, code = fn(*args, **kwargs)
+                # add context perm to func
+                log.debug("kwargs data: %s", data)
 
-        return response, code
+                return fn(*args, **kwargs)
 
-    return wrapper
+            except Exception as e:
+                if page:
+                    return redirect(url_for('login_page.login', error=str(e)))
+                raise e
+
+        return wrapper
+
+    return jwt_required_root
