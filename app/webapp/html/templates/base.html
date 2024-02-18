@@ -51,13 +51,78 @@
      {% block scripts %}
       <script>
         $(document).ready(function () {
+ 
+            var groupColumn = 0;
+            // group by git cluster 
+            var table = $('.by_env').DataTable({
+                columnDefs: [{ visible: false, targets: groupColumn }],
+                order: [[groupColumn, 'asc']],
+                displayLength: 25,
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
 
-        $('.table').DataTable();
+                    api.column(groupColumn, { page: 'current' })
+                        .data()
+                        .each(function (group, i) {
+                            if (last !== group) {
+                                $(rows)
+                                    .eq(i)
+                                    .before(
+                                        '<tr class="group"><td colspan="5"><h5>' +
+                                            group +
+                                        '</h5></td></tr>'
+                                    );
 
+                                last = group;
+                            }
+                        });
+                }
+        });
+
+
+        // Order by the grouping
+        $('.by_env tbody').on('click', 'tr.group', function () {
+            var currentOrder = table.order()[0];
+            if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+                table.order([groupColumn, 'desc']).draw();
+            }
+            else {
+                table.order([groupColumn, 'asc']).draw();
+            }
+        });
+
+    
+        table.on('click', 'tbody tr', (e) => {
+
+            let classList = e.currentTarget.classList;
+        
+            if (classList.contains('selected')) {
+                classList.remove('selected');
+            }
+            else {
+                table.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+                classList.add('selected');
+            }
+        });
+        
+        //document.querySelector('button').addEventListener('click', function () {
+        //    table.row('.selected').remove().draw(false);
+        //});
+
+
+
+        // basic table
+        $('.simple_table').DataTable();
+
+        // refresh button
         $('.refresh-button').click(function () {
            location.reload();
         });
 
+
+        // open modal window
         $('.edit-modal-opener').click(function () {
                 var url = $(this).data('whatever');
                 $.get(url, function (data) {

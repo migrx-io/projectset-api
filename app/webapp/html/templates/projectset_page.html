@@ -1,23 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>ProjectSet CRDs</h3>
-<button class="edit-modal-opener btn btn-success" 
+<button id="create_projectset" class="edit-modal-opener btn btn-success" 
    data-toggle="modal"
-   data-whatever="{{ url_for('projectset_page.create') }}" href="#">Create instance</button>
+   data-whatever="{{ url_for('projectset_page.create') }}" href="#">Create</button>
+<button id="edit_projectset" class="edit-modal-opener btn btn-primary" 
+   data-toggle="modal"
+   data-whatever="{{ url_for('projectset_page.edit') }}" href="#">Edit</button>
+<button id="delete_projectset" class="edit-modal-opener btn btn-danger" 
+   data-toggle="modal"
+   data-whatever="{{ url_for('projectset_page.delete') }}" href="#">Delete</button>
+
 <button class="refresh-button btn btn-light" href="#">Refresh</button>
 <hr>
 <div class="container-fluid">
-  <table id="data" class="table table-striped">
+
+  <table id="data" class="table by_env">
     <thead>
       <tr>
+        <th>repo</th>
+        <th>enviroment</th>
         <th>name</th>
+        <th>template</th>
         <th>labels</th>
         <th>annotations</th>
       </tr>
     </thead>
     <tbody>
       {% for i in projectset_list %}
+        <tr>
+          <td>{{ i.repo }}</td>
+          <td>{{ i.env }}</td>
           <td>{{ i.name }}</td>
+          <td>{{ i.template }}</td>
           <td>{{ i.labels }}</td>
           <td>{{ i.annotations }}</td>
         </tr>

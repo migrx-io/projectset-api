@@ -3,17 +3,50 @@ import logging as log
 
 def get_projectset():
 
-    crds = []
+    crds = [
+            {
+            "repo": "https://github.com/migrx-io/projectset-crds.git",
+            "env": "test-ocp-cluster",
+            "name": "dev-app",
+            "template": "dev-small",
+            "labels": {
+                "app.kubernetes.io/name": "projectset2",
+                "app.kubernetes.io/instance": "projectse2t",
+                "app.kubernetes.io/part-of": "projectset-operator",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/created-by": "projectset-operator"
+                },
+            "annotations": {
+                "app.kubernetes.io/name": "projectset2",
+                "app.kubernetes.io/instance": "projectset2",
+                "app.kubernetes.io/part-of": "projectset-operator",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/created-by": "projectset-operator"
+                },
+            },
 
-    obj = {
-        "name": "devenv",
-        "labels": "label=value",
-        "annotations": "annotations=value",
-    }
-
-    for i in range(20):
-        obj["name"] = obj["name"] + f"{i}"
-        crds.append(obj)
+            {
+            "repo": "https://github.com/migrx-io/projectset-crds.git",
+            "env": "prod-ocp-cluster",
+            "name": "prod-app",
+            "template": "dev-mid",
+            "labels": {
+                "app.kubernetes.io/name": "projectset",
+                "app.kubernetes.io/instance": "projectset",
+                "app.kubernetes.io/part-of": "projectset-operator",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/created-by": "projectset-operator"
+                },
+            "annotations": {
+                "app.kubernetes.io/name": "projectset",
+                "app.kubernetes.io/instance": "projectset",
+                "app.kubernetes.io/part-of": "projectset-operator",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/created-by": "projectset-operator"
+                },
+            }
+ 
+            ]
 
     log.debug("get_crds..")
 

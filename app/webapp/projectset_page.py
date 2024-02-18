@@ -18,3 +18,14 @@ def projectset():
 @jwt_required(True)
 def create():
     pass
+
+@projectset_page.route('/edit', methods=['GET', 'POST'])
+@jwt_required(True)
+def edit():
+    pass
+
+
+@projectset_page.route('/delete', methods=['GET', 'POST'])
+@jwt_required(True)
+def delete():
+    pass
