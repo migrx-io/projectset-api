@@ -16,5 +16,3 @@ def projectset():
 @projectset_page.route('/create', methods=['GET', 'POST'])
 def create():
     pass
-
-

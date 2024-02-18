@@ -3,38 +3,42 @@ import os
 import logging as log
 
 from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
-                                get_jwt)
+                                get_jwt, create_access_token)
 from flask import request, jsonify
-from app.util.types import AuthCodes
 
 
-def authenticate(username, password, user_data):
+def authenticate(username, password):
+
+    ok, data = auth_call(username, password)
+
+    log.debug("auth_call: status: %s / text %s", ok, data)
+
+    if not ok:
+        return False, data
+
+    # create access token
+    # Identity can be any data that is json serializable
+    access_token = create_access_token(identity=username,
+                                       additional_claims=data)
+
+    return True, access_token
+
+
+def auth_call(email, password):
+
+    log.debug("auth_call: email: %s / password %s", email, password)
+
+    if email == "" and password == "":
+        return False, "Invalid credentials"
 
     # if user admin - all perms
-    if username == "admin" and password == os.environ["ADMIN_PASSWD"] and \
+    if email == "admin" and password == os.environ.get("ADMIN_PASSWD", "") and \
             os.environ.get("ADMIN_DISABLE", "n") == "n":
-        return AuthCodes.YES, {"session": ""}
-
-    status, data = auth_call(username, password, user_data)
-
-    log.debug("auth_call: status: %s / text %s", status, data)
-
-    if status != 200:
-        log.error(data)
-        return AuthCodes.NO, data
-
-    return AuthCodes.YES, data
-
-
-def auth_call(login, password, user_data):
-
-    log.debug("auth_call: login: %s / password %s / data: %s", login, password,
-              user_data)
+        return True, {"session": ""}
 
     # Auth logic here
-    status, data = 200, {"session": ""}
 
-    return status, data
+    return True, {"session": ""}
 
 
 def check_permissions(login, claims, req):
@@ -46,7 +50,7 @@ def check_permissions(login, claims, req):
 
     # retunr False, data
 
-    return True, "ok"
+    return True, None
 
 
 def jwt_required(fn):

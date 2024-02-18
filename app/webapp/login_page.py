@@ -2,6 +2,7 @@ from flask import (Blueprint, render_template, request, redirect, url_for,
                    make_response)
 
 import logging as log
+from app.util.auth import authenticate
 
 login_page = Blueprint('login_page', __name__)
 
@@ -24,15 +25,16 @@ def login():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    if email == "" and password == "":
-        error = 'Invalid Credentials. Please try again.'
-        return render_template("login_page.html", error=error)
+    is_auth, data = authenticate(email, password)
+
+    if not is_auth:
+        return render_template("login_page.html", error=data)
 
     log.debug("make response..")
 
     response = make_response(redirect(url_for('repo_page.repo')))
     # set jwt cookie
-    response.set_cookie('access_token', 'super')
+    response.set_cookie('access_token', data)
 
     return response
 

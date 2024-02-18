@@ -1,21 +1,26 @@
-Logout
-Logout
+Get projectset list
+Get projectset list
 ---
 tags:
-  - Auth
+  - Projectset
 
 produces:
   - application/json
-consumes:
-  - application/json
-
 
 responses:
   200:
-    description: "Logout result"
+    description: "Projectset list"
     schema:
+
+      type: array
+      items:
+        type: object
+        properties:
+          cluster:
+            type: string
+            description: Projectset name
       example:
-          "ok"
+        [{'name': 'main'}]
 
   500:
     description: "Error response"

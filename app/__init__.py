@@ -13,10 +13,10 @@ from flask_jwt_extended import JWTManager
 
 from flasgger import Swagger
 
-from app.api.auth import auth
-from app.api.cluster import clstr
-
 from app.util.errors import handle_internal_error
+
+from app.api.auth_api import auth_api
+from app.api.projectset_api import projectset_api
 
 from app.webapp.login_page import login_page
 from app.webapp.repo_page import repo_page
@@ -102,11 +102,10 @@ with app.app_context():
 
 # Register blueprint(s)
 
-# Auth
-app.register_blueprint(auth, url_prefix='/api/v1/')
+# API
 
-# Cluster
-app.register_blueprint(clstr, url_prefix='/api/v1/')
+app.register_blueprint(auth_api, url_prefix='/api/v1/')
+app.register_blueprint(projectset_api, url_prefix='/api/v1/')
 
 # Webapp
 app.register_blueprint(login_page, url_prefix='/')
