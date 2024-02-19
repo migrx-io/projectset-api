@@ -41,8 +41,23 @@ def create():
 @projectset_page.route('/edit', methods=['GET', 'POST'])
 @jwt_required(True)
 def edit():
-    pass
 
+    if request.method == 'POST':
+
+        data = request.form.get('data')
+
+        log.debug("create: data: %s", data)
+
+        try:
+            edit_projectset(data)
+
+        except Exception as e:
+            return {"error": str(e)}
+        # pass
+        return {"status": "ok"}
+
+    return render_template('projectset_edit_modal.html',
+                           csrf_token=os.environ["SECRET"])
 
 @projectset_page.route('/delete', methods=['GET', 'POST'])
 @jwt_required(True)
