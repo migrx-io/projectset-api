@@ -1,4 +1,3 @@
-import os
 import logging as log
 from flask import Blueprint, render_template, request
 from app.util.auth import jwt_required
@@ -35,8 +34,7 @@ def create():
         # pass
         return {"status": "ok"}
 
-    return render_template('modal_form_page.html',
-                           csrf_token=os.environ["SECRET"])
+    return render_template('modal_form_page.html')
 
 
 @projectset_page.route('/edit', methods=['GET', 'POST'])
@@ -56,8 +54,7 @@ def edit():
         # pass
         return {"status": "ok"}
 
-    return render_template('modal_form_page.html',
-                           csrf_token=os.environ["SECRET"])
+    return render_template('modal_form_page.html')
 
 
 @projectset_page.route('/delete', methods=['GET', 'POST'])

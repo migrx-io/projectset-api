@@ -37,8 +37,6 @@ log.basicConfig(
     format='[%(asctime)s] [%(threadName)s] %(levelname)s - %(message)s',
 )
 
-os.environ['SECRET'] = "".join(
-    random.choices(string.ascii_lowercase + string.digits, k=20))
 app.config['JWT_SECRET_KEY'] = "secret"
 # "".join(random.choices(string.ascii_lowercase + string.digits, k=20))
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(

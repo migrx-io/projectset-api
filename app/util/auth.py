@@ -5,6 +5,7 @@ import logging as log
 from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
                                 get_jwt, create_access_token)
 from flask import request, jsonify, redirect, url_for
+from werkzeug.datastructures import Headers
 
 
 def authenticate(username, password):
@@ -61,7 +62,6 @@ def jwt_required(page=False):
         def wrapper(*args, **kwargs):
 
             # check APIKEY if exists
-
             api_key = request.headers.get('X-API-KEY')
             if api_key is not None:
 
@@ -71,13 +71,14 @@ def jwt_required(page=False):
                 return fn(*args, **kwargs)
 
             # verify JWT token
-
             try:
 
-                csrf_token = request.form.get("csrf_token")
-                if csrf_token is not None and csrf_token == os.environ[
-                        "SECRET"]:
-                    return fn(*args, **kwargs)
+                cookie = request.cookies.get("access_token_cookie")
+                if cookie is not None:
+                    # Create a new headers object with additional headers
+                    new_headers = Headers(request.headers)
+                    new_headers.add("Authorization", f"JWT {cookie}")
+                    request.headers = new_headers
 
                 verify_jwt_in_request()
 
