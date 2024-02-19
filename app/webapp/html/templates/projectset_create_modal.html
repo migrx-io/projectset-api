@@ -4,11 +4,10 @@
     </div>
     <div class="modal-body">
 
-
-
         <h5>Example CRD from Template</h5>
+        <i>You can define ProjectSetTemplate and reference it (<b>template</b>) to create ProjectSet</i>
         <div class="mb-3">
-        <textarea class="form-control" rows="5" disabled readonly>
+        <textarea class="form-control" rows="1" disabled readonly>
 apiVersion: project.migrx.io/v1alpha1
 kind: ProjectSet
 metadata:
@@ -24,13 +23,12 @@ spec:
     app.kubernetes.io/name: dev-app
     app.kubernetes.io/lang: golang
   template: dev-small
-
         </textarea>
         </div>
-
         <h5>Example CRD</h5>
+        <i>Create a ProjectSet with all defined resources (template data will be overwritten if a template is defined)</i>
         <div class="mb-3">
-        <textarea class="form-control" rows="5" disabled readonly>
+        <textarea class="form-control" rows="1" disabled readonly>
 apiVersion: project.migrx.io/v1alpha1
 kind: ProjectSet
 metadata:
@@ -119,9 +117,9 @@ spec:
         </textarea>
         </div>
 
-        <h5>Copy example, modify and past here</h5>
+        <h5>Copy example, modify and save</h5>
         <div class="mb-3">
-          <textarea class="form-control" name="data" rows="20"></textarea>
+          <textarea class="form-control" name="data" rows="10"></textarea>
         </div>
     </div>
 
