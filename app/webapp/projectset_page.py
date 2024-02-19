@@ -13,6 +13,7 @@ def projectset():
     projectset_list = get_projectset()
 
     return render_template('projectset_page.html',
+                           jsonschema={"type": "boolean"},
                            projectset_list=projectset_list)
 
 
@@ -34,7 +35,7 @@ def create():
         # pass
         return {"status": "ok"}
 
-    return render_template('projectset_create_modal.html',
+    return render_template('modal_form_page.html',
                            csrf_token=os.environ["SECRET"])
 
 
@@ -49,15 +50,15 @@ def edit():
         log.debug("create: data: %s", data)
 
         try:
-            edit_projectset(data)
-
+            pass
         except Exception as e:
             return {"error": str(e)}
         # pass
         return {"status": "ok"}
 
-    return render_template('projectset_edit_modal.html',
+    return render_template('modal_form_page.html',
                            csrf_token=os.environ["SECRET"])
+
 
 @projectset_page.route('/delete', methods=['GET', 'POST'])
 @jwt_required(True)
