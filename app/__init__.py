@@ -32,12 +32,15 @@ app = Flask(
 )
 
 log.basicConfig(
-    stream=sys.stdout,
+    stream=sys.stderr,
     level=os.environ.get("LOGLEVEL", "INFO"),
     format='[%(asctime)s] [%(threadName)s] %(levelname)s - %(message)s',
 )
 
-app.config['JWT_SECRET_KEY'] = "secret" # "".join(random.choices(string.ascii_lowercase + string.digits, k=20))
+os.environ['SECRET'] = "".join(
+    random.choices(string.ascii_lowercase + string.digits, k=20))
+app.config['JWT_SECRET_KEY'] = "secret"
+# "".join(random.choices(string.ascii_lowercase + string.digits, k=20))
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(
     os.environ.get("JWT_EXP", "31536000"))
 app.config['JWT_HEADER_TYPE'] = os.environ.get("JWT_HEADER", "JWT")

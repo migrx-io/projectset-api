@@ -1,9 +1,9 @@
 <form id="ModalForm" name="stepForm" class="form" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
     <div class="modal-header">
         <h4 class="modal-title">Create ProjectSet CRD</h4>
     </div>
     <div class="modal-body">
-
         <h5>Example CRD from Template</h5>
         <i>You can define ProjectSetTemplate and reference it (<b>template</b>) to create ProjectSet</i>
         <div class="mb-3">

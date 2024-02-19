@@ -4,7 +4,7 @@ import logging as log
 
 from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
                                 get_jwt, create_access_token)
-from flask import request, jsonify, url_for, redirect
+from flask import request, jsonify, render_template
 
 
 def authenticate(username, password):
@@ -73,6 +73,12 @@ def jwt_required(page=False):
             # verify JWT token
 
             try:
+
+                csrf_token = request.form.get("csrf_token")
+                if csrf_token is not None and csrf_token == os.environ[
+                        "SECRET"]:
+                    return fn(*args, **kwargs)
+
                 verify_jwt_in_request()
 
                 login = get_jwt_identity()
@@ -93,7 +99,8 @@ def jwt_required(page=False):
 
             except Exception as e:
                 if page:
-                    return redirect(url_for('login_page.login', error=str(e)))
+                    return render_template("error_page.html", error=str(e))
+                    # return redirect(url_for('login_page.login', error=str(e)))
                 raise e
 
         return wrapper

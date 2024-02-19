@@ -120,11 +120,13 @@
         // open modal window
         $('.edit-modal-opener').click(function () {
                 var url = $(this).data('whatever');
+
                 $.get(url, function (data) {
                     $('#Modal .modal-content').html(data);
                     $('#Modal').modal();
                     $('#submit').click(function (event) {
                         event.preventDefault();
+
                         $.post(url, data = $('#ModalForm').serialize(), function (
                             data) {
                             if (data.status == 'ok') {
