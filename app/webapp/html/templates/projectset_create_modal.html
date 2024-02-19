@@ -1,10 +1,127 @@
 <form id="ModalForm" name="stepForm" class="form" method="post">
     <div class="modal-header">
-        <h4 class="modal-title">SCT Task</h4>
+        <h4 class="modal-title">Create ProjectSet CRD</h4>
     </div>
     <div class="modal-body">
+
+
+
+        <h5>Example CRD from Template</h5>
         <div class="mb-3">
-          <input class="form-control" name="name" placeholder="SCT Config name">
+        <textarea class="form-control" rows="5" disabled readonly>
+apiVersion: project.migrx.io/v1alpha1
+kind: ProjectSet
+metadata:
+  annotations:
+    app.kubernetes.io/name: projectset
+  name: devteam-projectset
+spec:
+  namespace: dev-app
+  labels:
+    app: frontend
+    stage: dev
+  annotations:
+    app.kubernetes.io/name: dev-app
+    app.kubernetes.io/lang: golang
+  template: dev-small
+
+        </textarea>
+        </div>
+
+        <h5>Example CRD</h5>
+        <div class="mb-3">
+        <textarea class="form-control" rows="5" disabled readonly>
+apiVersion: project.migrx.io/v1alpha1
+kind: ProjectSet
+metadata:
+  annotations:
+    app.kubernetes.io/name: projectset
+  name: devteam-projectset
+spec:
+  namespace: dev-app
+  labels:
+    app: frontend
+    stage: dev
+  annotations:
+    app.kubernetes.io/name: dev-app
+    app.kubernetes.io/lang: golang
+  resourceQuota:
+    hard:
+      requests.cpu: "2"
+      requests.memory: 3Gi
+      limits.cpu: "4"
+      limits.memory: 6Gi
+  limitRange:
+    limits:
+      - default:
+          cpu: 500m
+          memory: "50Mi"
+        defaultRequest:
+          cpu: 500m
+          memory: "50Mi"
+        max:
+          cpu: "1"
+          memory: "4Gi"
+        min:
+          cpu: 100m
+          memory: "50Mi"
+        type: Container
+  roleRules:
+    developer:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+          - pods
+        verbs: ["*"]
+    admin:
+      - apiGroups:
+          - ""
+          - apps
+        resources:
+          - configmaps
+          - deployments
+          - events
+          - secrets
+          - serviceaccounts
+        verbs: ["*"]
+  groupPermissions:
+    admin:
+      - kind: "Group"
+        name: "admin"
+    developer:
+      - kind: "Group"
+        name: "developer"
+  policySpec:
+    allow-dns:
+      podSelector:
+        matchLabels: {}
+      policyTypes:
+      - Egress
+      egress:
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        ports:
+        - protocol: UDP
+          port: 53
+    deny-egress:
+      podSelector:
+        matchLabels: {}
+      policyTypes:
+        - Egress
+    deny-ingress:
+      podSelector:
+        matchLabels: {}
+      policyTypes:
+        - Egress
+        </textarea>
+        </div>
+
+        <h5>Copy example, modify and past here</h5>
+        <div class="mb-3">
+          <textarea class="form-control" name="data" rows="20"></textarea>
         </div>
     </div>
 
@@ -12,7 +129,7 @@
 
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button id="submit" type="submit" class="btn btn-primary">Go</button>
+        <button id="submit" type="submit" class="btn btn-primary">Save</button>
     </div>
 </form>
 

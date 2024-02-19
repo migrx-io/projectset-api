@@ -4,14 +4,9 @@
 <button id="create_projectset" class="edit-modal-opener btn btn-success" 
    data-toggle="modal"
    data-whatever="{{ url_for('projectset_page.create') }}" href="#">Create</button>
-<button id="edit_projectset" class="edit-modal-opener btn btn-primary" 
-   data-toggle="modal"
-   data-whatever="{{ url_for('projectset_page.edit') }}" href="#">Edit</button>
 <button id="delete_projectset" class="edit-modal-opener btn btn-danger" 
    data-toggle="modal"
    data-whatever="{{ url_for('projectset_page.delete') }}" href="#">Delete</button>
-
-<button class="refresh-button btn btn-light" href="#">Refresh</button>
 <hr>
 <div class="container-fluid">
 
@@ -33,8 +28,16 @@
           <td>{{ i.env }}</td>
           <td>{{ i.name }}</td>
           <td>{{ i.template }}</td>
-          <td>{{ i.labels }}</td>
-          <td>{{ i.annotations }}</td>
+          <td>
+              {% for tag in i.label_tags %}
+                <span class="badge bg-secondary rounded-pill">{{tag}}</span>
+              {% endfor %}
+          </td>
+          <td>
+              {% for tag in i.annotation_tags %}
+                <span class="badge bg-secondary rounded-pill">{{tag}}</span>
+              {% endfor %}
+          </td>
         </tr>
       {% endfor %}
     </tbody>

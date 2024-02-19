@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 # import app
 from app.util.auth import jwt_required
-from app.crds.projectsets import get_projectset
+from app.crds.projectsets import get_projectset, create
 
 projectset_page = Blueprint('projectset_page', __name__)
 
@@ -10,6 +10,7 @@ projectset_page = Blueprint('projectset_page', __name__)
 @jwt_required(True)
 def projectset():
     projectset_list = get_projectset()
+
     return render_template('projectset_page.html',
                            projectset_list=projectset_list)
 
@@ -17,7 +18,21 @@ def projectset():
 @projectset_page.route('/create', methods=['GET', 'POST'])
 @jwt_required(True)
 def create():
-    pass
+    if request.method == 'POST':
+
+        name = request.form.get('name', "x")
+
+        try:
+            create(name)
+
+        except Exception as e:
+            return {"error": str(e)}
+        # pass
+        return {"status": "ok"}
+
+    return render_template('projectset_create_modal.html')
+
+
 
 @projectset_page.route('/edit', methods=['GET', 'POST'])
 @jwt_required(True)

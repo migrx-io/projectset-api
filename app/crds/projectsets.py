@@ -48,6 +48,25 @@ def get_projectset():
  
             ]
 
+
+    # transform labels to tags
+    for crd in crds:
+
+        labels = crd.get("labels", {})
+        annotations = crd.get("annotations", {})
+
+        label_tags = []
+        for k, v in labels.items():
+            label_tags.append("{}={}".format(k, v))
+
+        annotation_tags = []
+        for k, v in annotations.items():
+            annotation_tags.append("{}={}".format(k, v))
+
+
+        crd["label_tags"] = label_tags
+        crd["annotation_tags"] = annotation_tags
+
     log.debug("get_crds..")
 
     return crds

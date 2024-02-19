@@ -13,7 +13,6 @@
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/jquery.dataTables.js") }}"></script>
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/dataTables.bootstrap5.js") }}"></script>
 
-
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -31,7 +30,7 @@
         <div class="navbar-end">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <div class="nav-link text-light">admin@admin.com</div>
+                    <div class="nav-link text-light">user</div>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('login_page.logout') }}">Logout</a>
@@ -55,7 +54,8 @@
             var groupColumn = 0;
             // group by git cluster 
             var table = $('.by_env').DataTable({
-                columnDefs: [{ visible: false, targets: groupColumn }],
+                columnDefs: [{ className: "dt-nowrap", "targets": [1,2,3] },
+                             { visible: false, targets: groupColumn }],
                 order: [[groupColumn, 'asc']],
                 displayLength: 25,
                 drawCallback: function (settings) {
@@ -93,7 +93,7 @@
             }
         });
 
-    
+        
         table.on('click', 'tbody tr', (e) => {
 
             let classList = e.currentTarget.classList;
@@ -105,22 +105,17 @@
                 table.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
                 classList.add('selected');
             }
-        });
-        
-        //document.querySelector('button').addEventListener('click', function () {
-        //    table.row('.selected').remove().draw(false);
-        //});
 
+        });
+    
+        table.on('dblclick', 'tbody tr', function () {
+            var data = table.row( this ).data();
+            alert( 'You clicked on '+data[0]+'\'s row' );
+        });
 
 
         // basic table
         $('.simple_table').DataTable();
-
-        // refresh button
-        $('.refresh-button').click(function () {
-           location.reload();
-        });
-
 
         // open modal window
         $('.edit-modal-opener').click(function () {
@@ -144,12 +139,14 @@
             });
 
         });
+
      </script>
+
     {% endblock %}
  
     <!-- Dynamic Modal -->
     <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="FormModal" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <!-- load content here -->
             </div>
