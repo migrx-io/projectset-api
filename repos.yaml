@@ -1,9 +1,0 @@
-repos:
-  - name: dev
-    description: Dev repo for dev/preprod clusters
-    url: https://github.com/migrx-io/projectset-crds.git
-    token: <token>
-  - name: prod
-    description: Prod repo for production clusters
-    url: https://github.com/migrx-io/projectset-crds.git
-    token: <token>
