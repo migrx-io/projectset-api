@@ -65,19 +65,15 @@ def edit(crd_id):
     return render_template('modal_projectset_upsert_page.html', data=data)
 
 
-@projectset_page.route('/delete/<crd_id>', methods=['GET', 'POST'])
+@projectset_page.route('/delete/<crd_id>', methods=['POST'])
 @jwt_required(True)
 def delete(crd_id):
 
-    if request.method == 'POST':
+    log.debug("delete: crd_id: %s", crd_id)
 
-        log.debug("delete: crd_id: %s", crd_id)
-
-        try:
-            delete_projectset(crd_id)
-        except Exception as e:
-            return {"error": str(e)}
-        # pass
-        return {"status": "ok"}
-
-    return render_template('modal_config_page.html', data=f"Delete {crd_id}?")
+    try:
+        delete_projectset(crd_id)
+    except Exception as e:
+        return {"error": str(e)}
+    # pass
+    return {"status": "ok"}
