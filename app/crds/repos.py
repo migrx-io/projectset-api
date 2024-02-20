@@ -7,12 +7,14 @@ def get_envs():
 
     envs = []
 
-    # data = yaml.safe_load(os.environ.get("APP_CONF", "app.yaml"))
+    with open(os.environ.get("APP_CONF", "app.yaml"), 'r') as file:
 
-    # log.debug("get_envs: data: %s", data)
+        data = yaml.safe_load(file)
 
-    # envs = data.get('repos', []) 
-    
-    log.debug("get_envs: %s", envs)
+        log.debug("get_envs: data: %s", data)
+
+        envs = data.get('repos', []) 
+        
+        log.debug("get_envs: %s", envs)
 
     return envs
