@@ -9,23 +9,15 @@
         <th>name</th>
         <th>desc</th>
         <th>git</th>
-        <th>env</th>
-        <th>ps path</th>
-        <th>ps count</th>
-        <th>pst path</th>
-        <th>pst count</th>
+        <th>branch</th>
       </tr>
     </thead>
     <tbody>
       {% for e  in env_list %}
           <td>{{ e.name }}</td>
-          <td>{{ e.descr }}</td>
-          <td>{{ e.giturl }}</td>
-          <td>{{ e.env }}</td>
-          <td>{{ e.ps_path }}</td>
-          <td>{{ e.ps_count }}</td>
-          <td>{{ e.pst_path }}</td>
-          <td>{{ e.pst_count }}</td>
+          <td>{{ e.description }}</td>
+          <td>{{ e.url }}</td>
+          <td>{{ e.branch }}</td>
         </tr>
       {% endfor %}
     </tbody>
