@@ -12,6 +12,7 @@ export ADMIN_DISABLE="n"
 export ADMIN_PASSWD=
 export PWORKERS=1
 export PWORKERS_SLEEP=15
+export APP_CONF=./repos.yaml
 
 ```
 
