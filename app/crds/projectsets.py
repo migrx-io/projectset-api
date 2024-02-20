@@ -69,5 +69,20 @@ def create_projectset(data):
     log.debug("create_projectset: data %s", data)
 
 
-def delete_projectset():
-    pass
+def update_projectset(crd_id, data):
+    log.debug("update_projectset: crd_id: %s,data %s", crd_id, data)
+
+
+def show_projectset(crd_id):
+    log.debug("show_projectset: crd_id %s", crd_id)
+
+    yaml = """
+    name: test
+
+    """
+
+    return yaml
+
+
+def delete_projectset(crd_id):
+    log.debug("delete_projectset: crd_id %s", crd_id)

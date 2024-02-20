@@ -106,8 +106,34 @@
         });
     
         table.on('dblclick', 'tbody tr', function () {
+
             var data = table.row( this ).data();
-            alert( 'You clicked on '+data[0]+'\'s row' );
+            crd_id = data[0] + "," + data[1] + "," + data[2]
+
+            var url = "/projectset/edit/" + btoa(crd_id)
+
+
+            $.get(url, function (data) {
+
+                    $('#Modal .modal-content').html(data);
+                    $('#Modal').modal();
+
+
+                    $('#submit').click(function (event) {
+                        event.preventDefault();
+
+                        $.post(url, data = $('#ModalForm').serialize(), function (
+                            data) {
+                            if (data.status == 'ok') {
+                                $('#Modal').modal('hide');
+                                location.reload();
+                            } else {
+                                $("#modal-error-text").text("ERROR: " + data.error);
+                            }
+                        })
+                    });
+                })
+
         });
 
         // open modal window
@@ -117,6 +143,7 @@
                 $.get(url, function (data) {
                     $('#Modal .modal-content').html(data);
                     $('#Modal').modal();
+
 
                     $('#submit').click(function (event) {
                         event.preventDefault();
@@ -134,6 +161,36 @@
                 })
             });
 
+        });
+
+        // open modal confirm window
+        $('.edit-modal-confirm-opener').click(function () {
+
+                var data = table.row( this ).data();
+                crd_id = data[0] + "," + data[1] + "," + data[2]
+
+                var url = "/projectset/delete/" + btoa(crd_id)
+
+                $.get(url, function (crd_id) {
+                    $('#Modal .modal-content').html(data);
+                    $('#Modal').modal();
+
+
+                    $('#submit').click(function (event) {
+                        event.preventDefault();
+
+                        $.post(url, data = $('#ModalForm').serialize(), function (
+                            data) {
+                            if (data.status == 'ok') {
+                                $('#Modal').modal('hide');
+                                location.reload();
+                            } else {
+                                $("#modal-error-text").text("ERROR: " + data.error);
+                            }
+                        })
+                    });
+             })
+            
         });
 
      </script>

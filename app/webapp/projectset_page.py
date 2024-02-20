@@ -1,7 +1,13 @@
 import logging as log
 from flask import Blueprint, render_template, request
 from app.util.auth import jwt_required
-from app.crds.projectsets import get_projectset, create_projectset
+from app.crds.projectsets import (
+    get_projectset,
+    create_projectset,
+    update_projectset,
+    show_projectset,
+    delete_projectset,
+)
 
 projectset_page = Blueprint('projectset_page', __name__)
 
@@ -34,12 +40,12 @@ def create():
         # pass
         return {"status": "ok"}
 
-    return render_template('modal_projectset_create_page.html')
+    return render_template('modal_projectset_upsert_page.html', data="")
 
 
-@projectset_page.route('/edit', methods=['GET', 'POST'])
+@projectset_page.route('/edit/<crd_id>', methods=['GET', 'POST'])
 @jwt_required(True)
-def edit():
+def edit(crd_id):
 
     if request.method == 'POST':
 
@@ -48,16 +54,30 @@ def edit():
         log.debug("create: data: %s", data)
 
         try:
-            pass
+            update_projectset(crd_id, data)
         except Exception as e:
             return {"error": str(e)}
         # pass
         return {"status": "ok"}
 
-    return render_template('modal_projectset_create_page.html')
+    log.debug("read current state: %s", crd_id)
+    data = show_projectset(crd_id)
+    return render_template('modal_projectset_upsert_page.html', data=data)
 
 
-@projectset_page.route('/delete', methods=['GET', 'POST'])
+@projectset_page.route('/delete/<crd_id>', methods=['GET', 'POST'])
 @jwt_required(True)
-def delete():
-    pass
+def delete(crd_id):
+
+    if request.method == 'POST':
+
+        log.debug("delete: crd_id: %s", crd_id)
+
+        try:
+            delete_projectset(crd_id)
+        except Exception as e:
+            return {"error": str(e)}
+        # pass
+        return {"status": "ok"}
+
+    return render_template('modal_config_page.html', data=f"Delete {crd_id}?")
