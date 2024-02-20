@@ -6,16 +6,12 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/bootstrap.min.css") }}" >
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/dataTables.bootstrap5.css") }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/brutusin-json-forms.css") }}">
 
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/jquery-3.6.0.min.js") }}"></script>
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/popper.min.js") }}"></script>
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/bootstrap.min.js") }}"></script>
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/jquery.dataTables.js") }}"></script>
     <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/dataTables.bootstrap5.js") }}"></script>
-
-    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/brutusin-json-forms.js") }}"></script>
-    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename="js/brutusin-json-forms-bootstrap.js") }}"></script>
 
 </head>
 <body>
@@ -117,18 +113,10 @@
         // open modal window
         $('.edit-modal-opener').click(function () {
                 var url = $(this).data('whatever');
-                var schema_str = $(this).data('jsonschema');
-                var schema = JSON.parse(schema_str.replace(/'/g, '"'))   
 
                 $.get(url, function (data) {
                     $('#Modal .modal-content').html(data);
                     $('#Modal').modal();
-
-                    var BrutusinForms = brutusin["json-forms"];
-                    var bf = BrutusinForms.create(schema);
-
-                    var container = document.getElementById('modal-form-div');
-                    bf.render(container, data);
 
                     $('#submit').click(function (event) {
                         event.preventDefault();
