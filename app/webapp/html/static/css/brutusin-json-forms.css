@@ -51,6 +51,7 @@
     -webkit-animation: spin2 .7s infinite linear;
 }
 
+
 @-webkit-keyframes spin2 {
     from { -webkit-transform: rotate(0deg);}
     to { -webkit-transform: rotate(360deg);}
@@ -69,7 +70,7 @@ form.brutusin-form input[type=checkbox]{
     min-width: auto !important;
 }
 form.brutusin-form  textarea{
-    height: 8em;
+    height: 1em;
 }
 form.brutusin-form table table{
     border-left:  solid 1px;
@@ -92,8 +93,8 @@ form.brutusin-form td.add-prop-name table td {
     vertical-align: middle;
 }
 form.brutusin-form td.prop-value {
-    width: 100%;   
     text-align: left;
+    vertical-align: middle;
 }
 form.brutusin-form td.item-index{
     font-size: 0.8em;
