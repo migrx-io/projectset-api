@@ -8,6 +8,7 @@ from app.crds.projectsets import (
     show_projectset,
     delete_projectset,
 )
+from app.crds.repos import get_envs
 
 projectset_page = Blueprint('projectset_page', __name__)
 
@@ -28,19 +29,23 @@ def create():
 
     if request.method == 'POST':
 
+        repo = request.form.get('repo')
+        env = request.form.get('env')
         data = request.form.get('data')
 
         log.debug("create: data: %s", data)
 
         try:
-            create_projectset(data)
+            create_projectset(repo, env, data)
 
         except Exception as e:
             return {"error": str(e)}
         # pass
         return {"status": "ok"}
 
-    return render_template('modal_projectset_upsert_page.html', data="")
+    # get repos and envs
+    envs = get_envs()
+    return render_template('modal_projectset_upsert_page.html', envs=envs, data="")
 
 
 @projectset_page.route('/edit/<crd_id>', methods=['GET', 'POST'])
@@ -62,7 +67,7 @@ def edit(crd_id):
 
     log.debug("read current state: %s", crd_id)
     data = show_projectset(crd_id)
-    return render_template('modal_projectset_upsert_page.html', data=data)
+    return render_template('modal_projectset_upsert_page.html', envs=[], data=data)
 
 
 @projectset_page.route('/delete/<crd_id>', methods=['POST'])

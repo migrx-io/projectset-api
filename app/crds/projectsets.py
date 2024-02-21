@@ -64,10 +64,56 @@ def get_projectset():
 
     return crds
 
+def build_tags(labels):
 
-def create_projectset(data):
-    log.debug("create_projectset: data %s", data)
+    label_tags = []
+    for k, v in labels.items():
+        label_tags.append(f"{k}={v}")
 
+    return label_tags
+
+ 
+
+
+def create_projectset(repo, env, yaml):
+
+    log.debug("create_projectset: repo: %s, env: %s data: %s",repo, env, yaml)
+
+    data = yaml.safe_load(yaml)
+    log.debug("get_yaml: data: %s", data)
+
+    # insert to projectset and tasks
+    """
+    with app.db.get_conn() as con:
+
+        con.execute(INSERT INTO
+                                  projectset(
+                                        uuid,
+                                        repo,
+                                        env,
+                                        name,
+                                        template,
+                                        labels,
+                                        annotations,
+                                        data)
+                              VALUES('{}',
+                                     '{}',
+                                     '{}',
+                                     '{}',
+                                     '{}',
+                                     '{}',
+                                     '{}',
+                                     '{}'
+                               ).format(task_uuid, name, "CREATE", "", "",
+                                           sct_config, dms_config, sql, "", "",
+                                           ""))
+
+    _update_task(app.db, task_uuid, "CREATE", "", "", "date_begin",
+                 datetime.now())
+
+    app.q_dms.put({"uuid": task_uuid, "name": name, "op": "CREATE"})
+    return task_uuid
+    """
 
 def update_projectset(crd_id, data):
     log.debug("update_projectset: crd_id: %s,data %s", crd_id, data)

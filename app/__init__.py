@@ -8,6 +8,8 @@ import os
 import random
 import string
 
+import queue
+
 from flask import Flask
 from flask_jwt_extended import JWTManager
 
@@ -24,7 +26,8 @@ from app.webapp.repo_page import repo_page
 from app.webapp.projectset_page import projectset_page
 
 from app.util.pool import Pool
-from app.util.workers import run_worker
+from app.util.push_worker import push, loop_unfinished_tasks
+from app.util.db import DB
 
 app = Flask(
     __name__,
@@ -95,12 +98,18 @@ Swagger(app, template=swag_conf, config=swag_config)
 with app.app_context():
 
     jwt = JWTManager(app)
-    # db = DB()
+    db = DB()
 
     # Gateway worker
     # q = queue.Queue()
-    pool = Pool(int(os.environ.get("PWORKERS", "1")), run_worker, {})
+    # pool = Pool(int(os.environ.get("PWORKERS", "1")), run_worker, {})
+    # pool.start()
+
+    # Git pull worker
+    q_git = queue.Queue()
+    pool = Pool(int(os.environ.get("PWORKERS", "1")), push, [db, q_git])
     pool.start()
+    loop_unfinished_tasks([db, q_git])
 
 # Register blueprint(s)
 

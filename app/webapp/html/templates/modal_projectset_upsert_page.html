@@ -4,7 +4,8 @@
     </div>
     <div class="modal-body">
 
-        <h5>Example CRD from Template</h5>
+        
+        <h6>Example CRD from Template</h6>
         <i>You can define ProjectSetTemplate and reference it (<b>template</b>) to create ProjectSet</i>
         <div class="mb-3">
         <textarea class="form-control" rows="1" disabled readonly>
@@ -25,9 +26,9 @@ spec:
   template: dev-small
         </textarea>
         </div>
-        <h5>Example CRD</h5>
+        <h6>Example CRD</h6>
         <i>Create a ProjectSet with all defined resources (template data will be overwritten if a template is defined)</i>
-        <div class="mb-3">
+        <div class="mb-3 ">
         <textarea class="form-control" rows="1" disabled readonly>
 apiVersion: project.migrx.io/v1alpha1
 kind: ProjectSet
@@ -124,9 +125,24 @@ spec:
         </textarea>
         </div>
 
-        <h5>Copy example, modify and save</h5>
+        <hr>
+        <h6>Repository</h6>
+        <select name="repo" id="repo" class="form-select">
+             {% for i in envs %}
+                <option value="{{ i.url }}">{{ i.url }}</option>
+             {% endfor %}
+        </select>
+
+        <h6>Enviroment</h6>
+        <select name="env" id="env" class="form-select">
+             {% for i in envs %}
+                <option value="{{ i.name }}">{{ i.name }}</option>
+             {% endfor %}
+        </select>
+
+        <h6>Copy example, modify and save</h6>
         <div class="mb-3">
-            <textarea class="form-control" name="data" rows="10">{{ data }}</textarea>
+            <textarea class="form-control" name="data" rows="8">{{ data }}</textarea>
         </div>
     </div>
 
