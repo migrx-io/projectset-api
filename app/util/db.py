@@ -1,5 +1,9 @@
 import sqlite3
-from app.util.sql import CREATE_TASKS, CREATE_PROJECTSET, CREATE_PROJECTSET_TEMPLATE
+from app.util.sql import (
+        CREATE_TASKS, CREATE_PROJECTSET, CREATE_PROJECTSET_TEMPLATE,
+        CREATE_TASKS_IDX, CREATE_PROJECTSET_IDX, CREATE_PROJECTSET_TEMPLATE_IDX,
+        )
+
 from pathlib import Path
 # import logging as log
 
@@ -28,11 +32,15 @@ class DB:
 
         with self.db as con:
             cur = con.cursor()
-            # cur.execute(DROP_TASKS)
             cur.execute(CREATE_TASKS)
-            # cur.execute(DELETE_TASKS)
             cur.execute(CREATE_PROJECTSET)
             cur.execute(CREATE_PROJECTSET_TEMPLATE)
+
+            cur.execute(CREATE_TASKS_IDX)
+            cur.execute(CREATE_PROJECTSET_IDX)
+            cur.execute(CREATE_PROJECTSET_TEMPLATE_IDX)
+
+
 
     def get_conn(self):
         return self.db
