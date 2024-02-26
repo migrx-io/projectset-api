@@ -81,7 +81,9 @@ def _parse_clone_dir(repo_url, repo_dir, myaml):
                 # for t in glob.glob("."):
                 log.debug("read projectset: %s", t)
 
-                with open("{}/{}".format(projectset_dir, t), "r", encoding="utf-8") as f:
+                with open("{}/{}".format(projectset_dir, t),
+                          "r",
+                          encoding="utf-8") as f:
                     data = f.read()
 
                     log.debug("DATA: %s", data)
