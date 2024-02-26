@@ -2,7 +2,7 @@ import logging as log
 import yaml
 import base64
 import app
-from app.util.push_worker import create_task
+from app.util.push_worker import create_task, update_task
 import json
 
 
@@ -58,7 +58,8 @@ def create_projectset(repo, env, ydata):
 
     name = data.get("metadata", {}).get("name")
 
-    uid = base64.b64encode(f"{repo,env,name}".encode("utf-8")).decode("utf-8")
+    uid = base64.b64encode(
+        f"{repo},{env},{name}".encode("utf-8")).decode("utf-8")
 
     log.debug("uid: %s", uid)
 
@@ -103,20 +104,70 @@ def create_projectset(repo, env, ydata):
         app.q_git.put({"uuid": uid, "op": "CREATE"})
 
 
-def update_projectset(crd_id, data):
-    log.debug("update_projectset: crd_id: %s,data %s", crd_id, data)
+def update_projectset(crd_id, ydata):
+    log.debug("update_projectset: crd_id: %s,data %s", crd_id, ydata)
+
+    data = yaml.safe_load(ydata)
+
+    log.debug("update data: %s", data)
+
+    with app.db.get_conn() as con:
+
+        log.debug("exec insert projectset..")
+
+        sql = """UPDATE projectset SET data = '{}',
+                                       labels = '{}',
+                                       annotations = '{}',
+                                       template = '{}'
+                 WHERE uuid = '{}'
+                               """.format(
+            ydata, json.dumps(build_tags(data.get("spec", {}).get("labels"))),
+            json.dumps(build_tags(data.get("spec", {}).get("annotations"))),
+            data.get("spec", {}).get("template"), crd_id)
+
+        log.debug("update sql: %s", sql)
+
+        con.execute(sql)
+
+    update_task(app.db,
+                uuid=crd_id,
+                op="UPDATE",
+                status="PENDING",
+                date_type="date_begin")
+
+    app.q_git.put({"uuid": crd_id, "op": "UPDATE"})
 
 
 def show_projectset(crd_id):
     log.debug("show_projectset: crd_id %s", crd_id)
 
-    dyaml = """
-    name: test
+    dyaml = ""
+    env = []
 
-    """
+    with app.db.get_conn() as con:
 
-    return dyaml
+        log.debug("select projectset..")
+
+        sql = """SELECT * FROM projectset
+                 WHERE uuid = '{}'""".format(crd_id)
+
+        cur = con.execute(sql)
+
+        for i in cur.fetchall():
+            log.debug("fetchall: %s", i)
+            dyaml = i["data"]
+            env.append({"url": i["repo"], "name": i["env"]})
+
+    return dyaml, env
 
 
 def delete_projectset(crd_id):
     log.debug("delete_projectset: crd_id %s", crd_id)
+
+    update_task(app.db,
+                uuid=crd_id,
+                op="DELETE",
+                status="PENDING",
+                date_type="date_begin")
+
+    app.q_git.put({"uuid": crd_id, "op": "DELETE"})

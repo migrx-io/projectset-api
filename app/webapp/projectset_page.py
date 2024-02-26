@@ -68,9 +68,9 @@ def edit(crd_id):
         return {"status": "ok"}
 
     log.debug("read current state: %s", crd_id)
-    data = show_projectset(crd_id)
+    data, env = show_projectset(crd_id)
     return render_template('modal_projectset_upsert_page.html',
-                           envs=[],
+                           envs=env,
                            data=data)
 
 

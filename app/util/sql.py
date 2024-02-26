@@ -26,7 +26,7 @@ CREATE_PROJECTSET = """CREATE TABLE IF NOT EXISTS
                                                         data text);
                     """
 
-CREATE_PROJECTSET_IDX = """                    
+CREATE_PROJECTSET_IDX = """
     CREATE UNIQUE INDEX IF NOT EXISTS projectset_idx ON projectset(uuid); 
                """
 
@@ -41,9 +41,7 @@ CREATE_PROJECTSET_TEMPLATE = """CREATE TABLE IF NOT EXISTS
                                                         data text);
                               """
 
-
-
-CREATE_PROJECTSET_TEMPLATE_IDX = """  
+CREATE_PROJECTSET_TEMPLATE_IDX = """
     CREATE UNIQUE INDEX IF NOT EXISTS projectset_template_idx ON projectset_template(uuid); 
 
 """
