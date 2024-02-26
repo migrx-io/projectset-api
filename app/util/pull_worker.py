@@ -67,7 +67,7 @@ def clone_pull_repo():
         if directory.exists():
             log.debug("exists")
 
-        else
+        else:
             log.debug("clone..")
             directory.mkdir(parents=True, exist_ok=True)
 
