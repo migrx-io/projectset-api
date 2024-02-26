@@ -128,4 +128,37 @@ def process_state(db, data):
 
     log.debug("process_state: db: %s, data: %s", db, data)
 
+    if data["op"] == "CREATE":
+
+        # add new branch
+
+        # create file
+
+        # push to origin
+
+        # create MR/PR
+        pass
+
+    elif data["op"] == "UPDATE":
+
+        # add new branch
+
+        # create file
+
+        # push to origin
+
+        # create MR/PR
+        pass
+
+    elif data["op"] == "DELETE":
+
+        # add new branch
+
+        # delete file
+
+        # push to origin
+
+        # create MR/PR
+        pass
+
     return True
