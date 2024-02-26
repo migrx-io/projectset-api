@@ -27,6 +27,8 @@ from app.webapp.projectset_page import projectset_page
 
 from app.util.pool import Pool
 from app.util.push_worker import push, loop_unfinished_tasks
+from app.util.pull_worker import pull, loop_unfinished_pull
+
 from app.util.db import DB
 
 app = Flask(
@@ -106,10 +108,16 @@ with app.app_context():
     # pool.start()
 
     # Git pull worker
-    q_git = queue.Queue()
-    pool = Pool(int(os.environ.get("PWORKERS", "1")), push, [db, q_git])
+    q_pull = queue.Queue()
+    pool = Pool(int(os.environ.get("PWORKERS", "1")), pull, [db, q_pull])
     pool.start()
-    loop_unfinished_tasks([db, q_git])
+    loop_unfinished_pull([db, q_pull])
+
+    # Git push worker
+    q_push = queue.Queue()
+    pool = Pool(int(os.environ.get("PWORKERS", "1")), push, [db, q_push])
+    pool.start()
+    loop_unfinished_tasks([db, q_push])
 
 # Register blueprint(s)
 

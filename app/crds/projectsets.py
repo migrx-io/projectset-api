@@ -101,7 +101,7 @@ def create_projectset(repo, env, ydata):
 
         create_task(app.db, uuid=uid, op="CREATE", status="PENDING")
 
-        app.q_git.put({"uuid": uid, "op": "CREATE"})
+        app.q_push.put({"uuid": uid, "op": "CREATE"})
 
 
 def update_projectset(crd_id, ydata):
@@ -135,7 +135,7 @@ def update_projectset(crd_id, ydata):
                 status="PENDING",
                 date_type="date_begin")
 
-    app.q_git.put({"uuid": crd_id, "op": "UPDATE"})
+    app.q_push.put({"uuid": crd_id, "op": "UPDATE"})
 
 
 def show_projectset(crd_id):
@@ -170,4 +170,4 @@ def delete_projectset(crd_id):
                 status="PENDING",
                 date_type="date_begin")
 
-    app.q_git.put({"uuid": crd_id, "op": "DELETE"})
+    app.q_push.put({"uuid": crd_id, "op": "DELETE"})
