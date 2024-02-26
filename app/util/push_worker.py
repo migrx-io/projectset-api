@@ -5,7 +5,16 @@ from datetime import datetime
 import os
 
 
-def _update_task(db, **kwargs):
+def create_task(db, **kwargs):
+    with db.get_conn() as con:
+        con.execute("""
+                    INSERT INTO tasks(uuid, op, status)
+                    VALUES ('{}', '{}', '{}')
+                    """.format(kwargs.get("uuid"), kwargs.get("op"),
+                               kwargs.get("status")))
+
+
+def update_task(db, **kwargs):
 
     if kwargs.get("status") == "":
         kwargs["status"] = "PENDING"
@@ -13,6 +22,8 @@ def _update_task(db, **kwargs):
     with db.get_conn() as con:
 
         if kwargs.get("date_type") == "date_begin":
+
+            log.debug("date_begin..%s", kwargs)
 
             con.execute("""
                         UPDATE tasks
@@ -23,6 +34,9 @@ def _update_task(db, **kwargs):
                                    kwargs.get("date_type"), kwargs.get("date"),
                                    kwargs.get("uuid")))
         else:
+
+            log.debug("update: %s", kwargs)
+
             con.execute("""
                         UPDATE tasks
                             SET op = '{}', status = '{}', error = '{}', {} = '{}'
@@ -88,24 +102,24 @@ def push(req):
         log.debug("process_state: result: %s", ok)
 
         if ok:
-            _update_task(db,
-                         uuid=data["uuid"],
-                         op=data["op"],
-                         status="FINISHED",
-                         error="",
-                         date_type="date_end",
-                         date=datetime.now())
+            update_task(db,
+                        uuid=data["uuid"],
+                        op=data["op"],
+                        status="FINISHED",
+                        error="",
+                        date_type="date_end",
+                        date=datetime.now())
 
     except Exception as e:
         log.error("process_state: ERROR: %s", e)
 
-        _update_task(db,
-                     uuid=data["uuid"],
-                     op=data["op"],
-                     status="ERROR",
-                     error=str(e),
-                     date_type="date_end",
-                     date=datetime.now())
+        update_task(db,
+                    uuid=data["uuid"],
+                    op=data["op"],
+                    status="ERROR",
+                    error=str(e),
+                    date_type="date_end",
+                    date=datetime.now())
 
     return "ok"
 

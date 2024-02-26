@@ -1,70 +1,45 @@
 import logging as log
+import yaml
+import base64
+import app
+from app.util.push_worker import create_task
+import json
 
 
 def get_projectset():
 
-    crds = [{
-        "repo": "https://github.com/migrx-io/projectset-crds.git",
-        "env": "test-ocp-cluster",
-        "name": "dev-app",
-        "template": "dev-small",
-        "labels": {
-            "app.kubernetes.io/name": "projectset2",
-            "app.kubernetes.io/instance": "projectse2t",
-            "app.kubernetes.io/part-of": "projectset-operator",
-            "app.kubernetes.io/managed-by": "kustomize",
-            "app.kubernetes.io/created-by": "projectset-operator"
-        },
-        "annotations": {
-            "app.kubernetes.io/name": "projectset2",
-            "app.kubernetes.io/instance": "projectset2",
-            "app.kubernetes.io/part-of": "projectset-operator",
-            "app.kubernetes.io/managed-by": "kustomize",
-            "app.kubernetes.io/created-by": "projectset-operator"
-        },
-    }, {
-        "repo": "https://github.com/migrx-io/projectset-crds.git",
-        "env": "prod-ocp-cluster",
-        "name": "prod-app",
-        "template": "dev-mid",
-        "labels": {
-            "app.kubernetes.io/name": "projectset",
-            "app.kubernetes.io/instance": "projectset",
-            "app.kubernetes.io/part-of": "projectset-operator",
-            "app.kubernetes.io/managed-by": "kustomize",
-            "app.kubernetes.io/created-by": "projectset-operator"
-        },
-        "annotations": {
-            "app.kubernetes.io/name": "projectset",
-            "app.kubernetes.io/instance": "projectset",
-            "app.kubernetes.io/part-of": "projectset-operator",
-            "app.kubernetes.io/managed-by": "kustomize",
-            "app.kubernetes.io/created-by": "projectset-operator"
-        },
-    }]
+    crds = []
 
-    # transform labels to tags
-    for crd in crds:
+    # get projectset and tasks
+    with app.db.get_conn() as con:
 
-        labels = crd.get("labels", {})
-        annotations = crd.get("annotations", {})
+        log.debug("exec insert projectset..")
 
-        label_tags = []
-        for k, v in labels.items():
-            label_tags.append(f"{k}={v}")
+        sql = """SELECT ps.*, t.status
+                 FROM projectset ps, tasks t
+                 WHERE ps.uuid = t.uuid"""
 
-        annotation_tags = []
-        for k, v in annotations.items():
-            annotation_tags.append(f"{k}={v}")
+        log.debug("sql: %s", sql)
 
-        crd["label_tags"] = label_tags
-        crd["annotation_tags"] = annotation_tags
+        ps = con.execute(sql)
+
+        for p in ps:
+
+            log.debug("p: %s", p)
+
+            p["labels"] = json.loads(p["labels"])
+            p["annotations"] = json.loads(p["annotations"])
+
+            crds.append(p)
 
     log.debug("get_crds..")
 
     return crds
 
+
 def build_tags(labels):
+
+    log.debug("build tags: %s", labels)
 
     label_tags = []
     for k, v in labels.items():
@@ -72,21 +47,27 @@ def build_tags(labels):
 
     return label_tags
 
- 
 
+def create_projectset(repo, env, ydata):
 
-def create_projectset(repo, env, yaml):
+    log.debug("create_projectset: repo: %s, env: %s data: %s", repo, env,
+              ydata)
 
-    log.debug("create_projectset: repo: %s, env: %s data: %s",repo, env, yaml)
-
-    data = yaml.safe_load(yaml)
+    data = yaml.safe_load(ydata)
     log.debug("get_yaml: data: %s", data)
 
+    name = data.get("metadata", {}).get("name")
+
+    uid = base64.b64encode(f"{repo,env,name}".encode("utf-8")).decode("utf-8")
+
+    log.debug("uid: %s", uid)
+
     # insert to projectset and tasks
-    """
     with app.db.get_conn() as con:
 
-        con.execute(INSERT INTO
+        log.debug("exec insert projectset..")
+
+        sql = """INSERT INTO
                                   projectset(
                                         uuid,
                                         repo,
@@ -104,16 +85,23 @@ def create_projectset(repo, env, yaml):
                                      '{}',
                                      '{}',
                                      '{}'
-                               ).format(task_uuid, name, "CREATE", "", "",
-                                           sct_config, dms_config, sql, "", "",
-                                           ""))
+                                     );
 
-    _update_task(app.db, task_uuid, "CREATE", "", "", "date_begin",
-                 datetime.now())
+                               """.format(
+            uid, repo, env, name,
+            data.get("spec", {}).get("template"),
+            json.dumps(build_tags(data.get("spec", {}).get("labels"))),
+            json.dumps(build_tags(data.get("spec", {}).get("annotations"))),
+            ydata)
 
-    app.q_dms.put({"uuid": task_uuid, "name": name, "op": "CREATE"})
-    return task_uuid
-    """
+        log.debug("sql: %s", sql)
+
+        con.execute(sql)
+
+        create_task(app.db, uuid=uid, op="CREATE", status="PENDING")
+
+        app.q_git.put({"uuid": uid, "op": "CREATE"})
+
 
 def update_projectset(crd_id, data):
     log.debug("update_projectset: crd_id: %s,data %s", crd_id, data)
@@ -122,12 +110,12 @@ def update_projectset(crd_id, data):
 def show_projectset(crd_id):
     log.debug("show_projectset: crd_id %s", crd_id)
 
-    yaml = """
+    dyaml = """
     name: test
 
     """
 
-    return yaml
+    return dyaml
 
 
 def delete_projectset(crd_id):

@@ -19,6 +19,7 @@
         <th>template</th>
         <th>labels</th>
         <th>annotations</th>
+        <th>status</th>
       </tr>
     </thead>
     <tbody>
@@ -29,15 +30,16 @@
           <td>{{ i.name }}</td>
           <td>{{ i.template }}</td>
           <td>
-              {% for tag in i.label_tags %}
+              {% for tag in i.labels %}
                 <span class="badge bg-secondary rounded-pill">{{tag}}</span>
               {% endfor %}
           </td>
           <td>
-              {% for tag in i.annotation_tags %}
+              {% for tag in i.annotations %}
                 <span class="badge bg-secondary rounded-pill">{{tag}}</span>
               {% endfor %}
           </td>
+          <td>{{ i.status }}</td>
         </tr>
       {% endfor %}
     </tbody>

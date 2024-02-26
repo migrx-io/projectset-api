@@ -45,7 +45,9 @@ def create():
 
     # get repos and envs
     envs = get_envs()
-    return render_template('modal_projectset_upsert_page.html', envs=envs, data="")
+    return render_template('modal_projectset_upsert_page.html',
+                           envs=envs,
+                           data="")
 
 
 @projectset_page.route('/edit/<crd_id>', methods=['GET', 'POST'])
@@ -67,7 +69,9 @@ def edit(crd_id):
 
     log.debug("read current state: %s", crd_id)
     data = show_projectset(crd_id)
-    return render_template('modal_projectset_upsert_page.html', envs=[], data=data)
+    return render_template('modal_projectset_upsert_page.html',
+                           envs=[],
+                           data=data)
 
 
 @projectset_page.route('/delete/<crd_id>', methods=['POST'])
