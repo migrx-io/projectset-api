@@ -22,4 +22,5 @@ def run_shell(s):
             return (0, _stdout)
 
     except Exception as e:
+        log.error("ERROR: %s", e)
         return (1, str(e))

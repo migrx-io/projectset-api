@@ -78,9 +78,12 @@ def _loop_unfinished_tasks(args):
 
         log.debug("start loop_unfinished_tasks..")
 
-        tasks = _get_all_tasks(db)
-        for t in tasks:
-            q.put({"uuid": t["uuid"], "op": t["op"]})
+        try:
+            tasks = _get_all_tasks(db)
+            for t in tasks:
+                q.put({"uuid": t["uuid"], "op": t["op"]})
+        except Exception as e:
+            log.error("_loop_unfinished_tasks: %s", e)
 
         time.sleep(int(os.environ.get("PWORKERS_SLEEP", "15")))
 

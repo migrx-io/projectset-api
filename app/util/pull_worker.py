@@ -47,6 +47,40 @@ def pull(req):
     return "ok"
 
 
+def _parse_clone_dir(repo_dir, myaml):
+
+    log.debug("start working on envs..")
+
+    for name, env in myaml.get("envs", []).items():
+        log.debug("parse name: %s env: %s", name, env)
+
+        # read templates
+        template_dir = "{}/{}".format(repo_dir,
+                                      env.get("projectset-templates"))
+        projectset_dir = "{}/{}".format(repo_dir, env.get("projectset-crds"))
+
+        log.debug("template_dir: %s, projectset_dir: %s", template_dir,
+                  projectset_dir)
+
+        # template
+        dirt = Path(template_dir)
+        if dirt.exists():
+            log.debug("exists")
+
+            for t in os.listdir(template_dir):
+                # for t in glob.glob("."):
+                log.debug("read template: %s", t)
+
+        # template
+        dirt = Path(projectset_dir)
+        if dirt.exists():
+            log.debug("exists")
+
+            for t in os.listdir(projectset_dir):
+                # for t in glob.glob("."):
+                log.debug("read projectset: %s", t)
+
+
 def clone_pull_repo():
 
     env_list = get_envs()
@@ -93,6 +127,9 @@ def clone_pull_repo():
             myaml = yaml.safe_load(f)
 
         log.debug("manifest: %s", myaml)
+
+        # iterate thru env
+        _parse_clone_dir(repo_dir, myaml)
 
 
 def process_state(db, data):
