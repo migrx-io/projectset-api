@@ -1,0 +1,32 @@
+Delete projectset
+Delete projectset
+---
+tags:
+  - Projectset
+
+produces:
+  - application/json
+
+
+parameters:
+
+  - in: path
+    name: uuid
+    description: "UUID parojectset"
+    required: true
+
+responses:
+  200:
+    description: "Result status"
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}
