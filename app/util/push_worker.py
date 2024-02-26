@@ -8,7 +8,7 @@ import os
 def create_task(db, **kwargs):
     with db.get_conn() as con:
         con.execute("""
-                    INSERT INTO tasks(uuid, op, status)
+                    INSERT OR IGNORE INTO tasks(uuid, op, status)
                     VALUES ('{}', '{}', '{}')
                     """.format(kwargs.get("uuid"), kwargs.get("op"),
                                kwargs.get("status")))

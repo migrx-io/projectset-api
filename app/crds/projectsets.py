@@ -48,7 +48,7 @@ def build_tags(labels):
     return label_tags
 
 
-def create_projectset(repo, env, ydata):
+def create_projectset(repo, env, ydata, silent=False):
 
     log.debug("create_projectset: repo: %s, env: %s data: %s", repo, env,
               ydata)
@@ -63,12 +63,19 @@ def create_projectset(repo, env, ydata):
 
     log.debug("uid: %s", uid)
 
+    ## if exist - silent return
+    _, e = show_projectset(uid)
+    if len(e) > 0 and silent:
+        return
+    if len(e) > 0 and not silent:
+        raise Exception("ProjectSet already exists")
+
     # insert to projectset and tasks
     with app.db.get_conn() as con:
 
         log.debug("exec insert projectset..")
 
-        sql = """INSERT INTO
+        sql = """INSERT OR IGNORE INTO
                                   projectset(
                                         uuid,
                                         repo,

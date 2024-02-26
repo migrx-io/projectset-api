@@ -2,10 +2,11 @@ import logging as log
 import time
 import threading
 import os
-from app.crds.repos import get_envs
 from pathlib import Path
-from app.util.exec import run_shell
 import yaml
+from app.crds.repos import get_envs
+from app.util.exec import run_shell
+from app.crds.projectsets import create_projectset
 
 
 def loop_unfinished_pull(args):
@@ -47,7 +48,7 @@ def pull(req):
     return "ok"
 
 
-def _parse_clone_dir(repo_dir, myaml):
+def _parse_clone_dir(repo_url, repo_dir, myaml):
 
     log.debug("start working on envs..")
 
@@ -71,7 +72,7 @@ def _parse_clone_dir(repo_dir, myaml):
                 # for t in glob.glob("."):
                 log.debug("read template: %s", t)
 
-        # template
+        # project set
         dirt = Path(projectset_dir)
         if dirt.exists():
             log.debug("exists")
@@ -79,6 +80,12 @@ def _parse_clone_dir(repo_dir, myaml):
             for t in os.listdir(projectset_dir):
                 # for t in glob.glob("."):
                 log.debug("read projectset: %s", t)
+
+                with open("{}/{}".format(projectset_dir, t), "r", encoding="utf-8") as f:
+                    data = f.read()
+
+                    log.debug("DATA: %s", data)
+                    create_projectset(repo_url, name, data, False)
 
 
 def clone_pull_repo():
@@ -129,7 +136,7 @@ def clone_pull_repo():
         log.debug("manifest: %s", myaml)
 
         # iterate thru env
-        _parse_clone_dir(repo_dir, myaml)
+        _parse_clone_dir(e["url"], repo_dir, myaml)
 
 
 def process_state(db, data):
