@@ -74,18 +74,20 @@ def create_projectset(repo, env, ydata, silent=False):
             # clear data for refresh from git
             with app.db.get_conn() as con:
 
-                sql = """DELETE FROM projectset  WHERE uuid = '{}'""".format(
+                sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(
                     uid)
 
-                log.debug("...1 %s", sql)
+                log.debug("!!!!!!!!!!!!!!...1 %s", sql)
 
-                # con.execute(sql)
+                con.execute(sql)
 
-                sql = """DELETE FROM tasks WHERE uuid = '{}'""".format(uid)
+                sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
 
-                log.debug("....2 %s", sql)
+                log.debug("!!!!!!!!!....2 %s", sql)
 
-                # con.execute(sql)
+                con.execute(sql)
+
+                con.commit()
 
     if len(e) > 0 and not silent:
         raise Exception("ProjectSet already exists")

@@ -190,7 +190,7 @@ def process_state(db, data):
 
             log.debug("DELETE: data: %s", ps)
 
-            parts = base64.b64decode(data["uuid"]).split(",")
+            parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
 
             log.debug("parts: %s", parts)
 
