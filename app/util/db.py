@@ -29,7 +29,8 @@ class DB:
     def _connect(self):
         # self.db = sqlite3.connect("file::memory:?cache=shared", check_same_thread=False)
         self.db = sqlite3.connect(f"{Path.cwd()}/config/app.db",
-                                  check_same_thread=False, isolation_level=None)
+                                  check_same_thread=False,
+                                  isolation_level=None)
         self.db.row_factory = dict_factory
 
     def _init_db(self):
