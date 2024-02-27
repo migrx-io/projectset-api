@@ -5,6 +5,7 @@ CREATE_TASKS = """CREATE TABLE IF NOT EXISTS
                                                   uuid text,
                                                   op text,
                                                   status text,
+                                                  type text,
                                                   error text,
                                                   date_begin timestamp,
                                                   date_end timestamp);

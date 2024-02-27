@@ -2,6 +2,7 @@ import logging as log
 import time
 import threading
 import os
+import traceback
 from pathlib import Path
 import yaml
 from app.crds.repos import get_envs
@@ -43,7 +44,7 @@ def pull(req):
         log.debug("process_state: result: %s", ok)
 
     except Exception as e:
-        log.error("process_state: ERROR: %s", e)
+        log.error("process_state: ERROR: %s \n %s", e, traceback.format_exc())
 
     return "ok"
 

@@ -4,6 +4,7 @@ import threading
 from datetime import datetime
 import os
 import base64
+import traceback
 
 
 def show_projectset(db, crd_id):
@@ -30,10 +31,10 @@ def show_projectset(db, crd_id):
 def create_task(db, **kwargs):
     with db.get_conn() as con:
         con.execute("""
-                    INSERT OR IGNORE INTO tasks(uuid, op, status)
-                    VALUES ('{}', '{}', '{}')
+                    INSERT OR IGNORE INTO tasks(uuid, op, type, status)
+                    VALUES ('{}', '{}', '{}', '{}')
                     """.format(kwargs.get("uuid"), kwargs.get("op"),
-                               kwargs.get("status")))
+                               kwargs.get('type'), kwargs.get("status")))
 
 
 def update_task(db, **kwargs):
@@ -103,7 +104,7 @@ def _loop_unfinished_tasks(args):
         try:
             tasks = _get_all_tasks(db)
             for t in tasks:
-                q.put({"uuid": t["uuid"], "op": t["op"]})
+                q.put({"uuid": t["uuid"], "type": t["type"], "op": t["op"]})
         except Exception as e:
             log.error("_loop_unfinished_tasks: %s", e)
 
@@ -136,7 +137,7 @@ def push(req):
                         date=datetime.now())
 
     except Exception as e:
-        log.error("process_state: ERROR: %s", e)
+        log.error("process_state: ERROR: %s \n %s", e, traceback.format_exc())
 
         update_task(db,
                     uuid=data["uuid"],
@@ -162,8 +163,6 @@ def process_state(db, data):
 
             log.debug("CREATE: data: %s", data)
 
-            log.debug("!!!!!!!!!!!!1base64: %s", base64.b64decode(data["uuid"]))
-
         # add new branch
 
         # create file
@@ -185,7 +184,6 @@ def process_state(db, data):
 
     elif data["op"] == "DELETE":
 
-
         if data["type"] == "projectset":
 
             ps = show_projectset(db, data["uuid"])
@@ -194,10 +192,7 @@ def process_state(db, data):
 
             parts = base64.b64decode(data["uuid"]).split(",")
 
-
-            
-
-
+            log.debug("parts: %s", parts)
 
         # add new branch
 
@@ -206,6 +201,5 @@ def process_state(db, data):
         # push to origin
 
         # create MR/PR
-        pass
 
     return True
