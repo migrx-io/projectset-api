@@ -39,7 +39,7 @@ def projectset_update(uid):
     file: ../apispec/projectset_update.yaml
     """
 
-    data = request.data
+    data = request.data.decode("utf-8")
 
     update_projectset(uid, data)
 
