@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app.util.auth import jwt_required
-from app.crds.projectsets import get_projectset, create_projectset, delete_projectset, update_projectset
+from app.crds.projectsets import (get_projectset, create_projectset,
+                                  delete_projectset, update_projectset)
 
 projectset_api = Blueprint('projectset_api', __name__)
 
@@ -26,11 +27,9 @@ def projectset_create():
 
     data = request.get_json()
 
-    projectset_list = create_projectset(data.get("repo"), 
-                                        data.get("name"), 
-                                        data.get("data"))
+    create_projectset(data.get("repo"), data.get("name"), data.get("data"))
 
-    return jsonify(projectset_list), 200
+    return jsonify("ok"), 200
 
 
 @projectset_api.route('/projectset/<uid>', methods=['PUT'])
@@ -42,7 +41,7 @@ def projectset_update(uid):
 
     data = request.data
 
-    projectset_list = update_projectset(uid, data)
+    update_projectset(uid, data)
 
     return jsonify("ok"), 200
 
