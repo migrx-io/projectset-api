@@ -5,6 +5,8 @@ from datetime import datetime
 import os
 import base64
 import traceback
+from app.crds.repos import get_envs
+from pathlib import Path
 
 
 def show_projectset(db, crd_id):
@@ -150,6 +152,45 @@ def push(req):
     return "ok"
 
 
+def clear_tables(db, uid):
+
+    with db.get_conn() as con:
+        sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(uid)
+        log.debug("!!!!!!!!!!!!!!...1 %s", sql)
+        con.execute(sql)
+
+        sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
+        log.debug("!!!!!!!!!....2 %s", sql)
+        con.execute(sql)
+
+
+def is_cr_exists(parts):
+
+    env_list = get_envs()
+    log.debug("env_list: %s", env_list)
+
+    for e in env_list:
+        if e["name"] == parts[1]:
+            log.debug("e: %s", e)
+            repo_dir = e["url"].split("/")[-1][:-4]
+            repo_conf = e["conf_file"]
+
+
+            # TODO
+            dir_name = "/tmp/{}/{}/"
+
+            # dir_name = "/tmp/" + e["name"] + "/{}.yaml".format(parts[2])
+
+            log.debug("is_cr_exists: dir_name: %s", dir_name)
+            dirt = Path(dir_name)
+
+            if dirt.exists():
+                return True
+            return False
+
+    return False
+
+
 def process_state(db, data):
 
     log.debug("process_state: db: %s, data: %s", db, data)
@@ -194,12 +235,19 @@ def process_state(db, data):
 
             log.debug("parts: %s", parts)
 
-        # add new branch
+            if is_cr_exists(parts):
+                log.debug("found file..deleting..")
 
-        # delete file
+                # add new branch
 
-        # push to origin
+                # delete file
 
-        # create MR/PR
+                # push to origin
+
+                # create MR/PR
+
+            else:
+                log.debug("file not found. clear table")
+                clear_tables(db, data["uuid"])
 
     return True

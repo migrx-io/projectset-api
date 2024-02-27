@@ -76,18 +76,12 @@ def create_projectset(repo, env, ydata, silent=False):
 
                 sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(
                     uid)
-
                 log.debug("!!!!!!!!!!!!!!...1 %s", sql)
-
                 con.execute(sql)
 
                 sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
-
                 log.debug("!!!!!!!!!....2 %s", sql)
-
                 con.execute(sql)
-
-                con.commit()
 
     if len(e) > 0 and not silent:
         raise Exception("ProjectSet already exists")
