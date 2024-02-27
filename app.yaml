@@ -20,7 +20,6 @@ roles:
         - annotations
         - namespace
         - template
-
   admin:
     projectset:
       edit:
