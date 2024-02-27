@@ -1,11 +1,11 @@
 repos:
-  - name: dev
+  - name: test-ocp-cluster
     description: Dev repo for dev/preprod clusters
     url: https://github.com/migrx-io/projectset-crds.git
     branch: main
     token: <token>
     conf_file: projectsets.yaml
-  - name: prod
+  - name: prod-ocp-cluster
     description: Prod repo for production clusters
     url: https://github.com/migrx-io/projectset-crds.git
     branch: main  

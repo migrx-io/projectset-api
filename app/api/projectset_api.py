@@ -24,7 +24,11 @@ def projectset_create():
     file: ../apispec/projectset_create.yaml
     """
 
-    projectset_list = create_projectset(repo, name, data)
+    data = request.get_json()
+
+    projectset_list = create_projectset(data.get("repo"), 
+                                        data.get("name"), 
+                                        data.get("data"))
 
     return jsonify(projectset_list), 200
 
