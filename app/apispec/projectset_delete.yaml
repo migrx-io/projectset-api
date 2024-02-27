@@ -7,9 +7,7 @@ tags:
 produces:
   - application/json
 
-
 parameters:
-
   - in: path
     name: uuid
     description: "UUID parojectset"

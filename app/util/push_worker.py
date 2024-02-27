@@ -5,6 +5,27 @@ from datetime import datetime
 import os
 
 
+def show_projectset(db, crd_id):
+    log.debug("show_projectset: crd_id %s", crd_id)
+
+    env = None
+
+    with db.get_conn() as con:
+
+        log.debug("select projectset..")
+
+        sql = """SELECT * FROM projectset
+                 WHERE uuid = '{}'""".format(crd_id)
+
+        cur = con.execute(sql)
+
+        for i in cur.fetchall():
+            log.debug("fetchall: %s", i)
+            env = {"url": i["repo"], "name": i["env"], "data": i["data"]}
+
+    return env
+
+
 def create_task(db, **kwargs):
     with db.get_conn() as con:
         con.execute("""
@@ -133,6 +154,13 @@ def process_state(db, data):
 
     if data["op"] == "CREATE":
 
+        # check if exists and eq
+
+        if data["type"] == "projectset":
+            data = show_projectset(db, data["uuid"])
+
+            log.debug("CREATE: data: %s", data)
+
         # add new branch
 
         # create file
@@ -140,7 +168,6 @@ def process_state(db, data):
         # push to origin
 
         # create MR/PR
-        pass
 
     elif data["op"] == "UPDATE":
 
@@ -154,6 +181,13 @@ def process_state(db, data):
         pass
 
     elif data["op"] == "DELETE":
+
+
+        if data["type"] == "projectset":
+            data = show_projectset(db, data["uuid"])
+
+            log.debug("DELETE: data: %s", data)
+
 
         # add new branch
 

@@ -164,7 +164,7 @@
         // open modal confirm window
         $('.edit-modal-confirm-opener').click(function () {
 
-                var data = table.rows('.selected').nodes()
+                var data = table.rows('.selected').data()
 
                 if (data.length == 0) {
                     alert("Select instance to delete")
