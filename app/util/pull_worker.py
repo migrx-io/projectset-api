@@ -87,7 +87,7 @@ def _parse_clone_dir(repo_url, repo_dir, myaml):
                     data = f.read()
 
                     log.debug("DATA: %s", data)
-                    create_projectset(repo_url, name, data, False)
+                    create_projectset(repo_url, name, data, True)
 
 
 def clone_pull_repo():

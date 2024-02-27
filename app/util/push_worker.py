@@ -3,6 +3,7 @@ import time
 import threading
 from datetime import datetime
 import os
+import base64
 
 
 def show_projectset(db, crd_id):
@@ -161,6 +162,8 @@ def process_state(db, data):
 
             log.debug("CREATE: data: %s", data)
 
+            log.debug("!!!!!!!!!!!!1base64: %s", base64.b64decode(data["uuid"]))
+
         # add new branch
 
         # create file
@@ -184,9 +187,16 @@ def process_state(db, data):
 
 
         if data["type"] == "projectset":
-            data = show_projectset(db, data["uuid"])
 
-            log.debug("DELETE: data: %s", data)
+            ps = show_projectset(db, data["uuid"])
+
+            log.debug("DELETE: data: %s", ps)
+
+            parts = base64.b64decode(data["uuid"]).split(",")
+
+
+            
+
 
 
         # add new branch

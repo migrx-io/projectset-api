@@ -66,7 +66,24 @@ def create_projectset(repo, env, ydata, silent=False):
     ## if exist - silent return
     _, e = show_projectset(uid)
     if len(e) > 0 and silent:
-        return
+        if e[0]["status"] == "FINISHED":
+
+            # clear data for refresh from git
+            with app.db.get_conn() as con:
+
+                sql = """DELETE FROM projectset  WHERE uuid = '{}'""".format(uid)
+
+                log.debug("...1 %s", sql)
+
+                # con.execute(sql)
+
+                sql = """DELETE FROM tasks WHERE uuid = '{}'""".format(uid)
+
+                log.debug("....2 %s", sql)
+
+                # con.execute(sql)
+
+
     if len(e) > 0 and not silent:
         raise Exception("ProjectSet already exists")
 
@@ -155,15 +172,16 @@ def show_projectset(crd_id):
 
         log.debug("select projectset..")
 
-        sql = """SELECT * FROM projectset
-                 WHERE uuid = '{}'""".format(crd_id)
+        sql = """SELECT ps.*, t.status
+                 FROM projectset ps, tasks t
+                 WHERE ps.uuid = t.uuid and ps.uuid = '{}'""".format(crd_id)
 
         cur = con.execute(sql)
 
         for i in cur.fetchall():
             log.debug("fetchall: %s", i)
             dyaml = i["data"]
-            env.append({"url": i["repo"], "name": i["env"]})
+            env.append({"url": i["repo"], "name": i["env"], "status": i["status"]})
 
     return dyaml, env
 
