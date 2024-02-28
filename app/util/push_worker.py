@@ -196,7 +196,7 @@ def is_cr_exists(parts):
     log.debug("is_cr_exists: dirt: %s", dirt)
 
     if dirt.exists():
-        return True, cr_dir_path, dirt, repo_dir, v
+        return True, cr_dir_path, dirt, parts[2], v
 
     return False, None, None, None, None
 
@@ -276,6 +276,11 @@ def process_state(db, data):
                 ok, err = run_shell(
                     "cd {} && git push origin delete_{}".format(
                         cr_dir, branch))
+                log.debug("ok: %s, err: %s", ok, err)
+
+                ok, err = run_shell(
+                    "cd {} && git checkout {} && git branch -D delete_{}".
+                    format(cr_dir, branch, v["branch"]))
                 log.debug("ok: %s, err: %s", ok, err)
 
                 # create MR/PR

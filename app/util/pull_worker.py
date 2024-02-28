@@ -111,6 +111,9 @@ def clone_pull_repo():
         if directory.exists():
             log.debug("exists")
 
+            ok, err = run_shell("cd {} && git remote set-url origin {}".format(
+                repo_dir, url_auth))
+
         else:
             log.debug("clone..")
             directory.mkdir(parents=True, exist_ok=True)
@@ -124,7 +127,9 @@ def clone_pull_repo():
             repo_dir, v["branch"]))
         log.debug("ok: %s, err: %s", ok, err)
 
-        ok, err = run_shell("cd {} && git pull".format(repo_dir))
+        # checkout to main before pull
+        ok, err = run_shell("cd {} git checkout {} && git pull".format(
+            repo_dir, v["branch"]))
         log.debug("ok: %s, err: %s", ok, err)
 
         # read repo manifest
