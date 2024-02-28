@@ -13,11 +13,11 @@
       </tr>
     </thead>
     <tbody>
-      {% for e  in env_list %}
-          <td>{{ e.name }}</td>
-          <td>{{ e.description }}</td>
-          <td>{{ e.url }}</td>
-          <td>{{ e.branch }}</td>
+      {% for k, v in env_list.items() %}
+          <td>{{ k }}</td>
+          <td>{{ v["description"] }}</td>
+          <td>{{ v["url"] }}</td>
+          <td>{{ v["branch"] }}</td>
         </tr>
       {% endfor %}
     </tbody>

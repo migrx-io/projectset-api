@@ -45,6 +45,8 @@ def create():
 
     # get repos and envs
     envs = get_envs()
+    envs = [{"name": k, "url": v["url"]} for k, v in envs.items()]
+
     return render_template('modal_projectset_upsert_page.html',
                            envs=envs,
                            data="")

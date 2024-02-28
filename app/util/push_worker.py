@@ -7,6 +7,7 @@ import base64
 import traceback
 from app.crds.repos import get_envs
 from pathlib import Path
+import yaml
 
 
 def show_projectset(db, crd_id):
@@ -156,11 +157,9 @@ def clear_tables(db, uid):
 
     with db.get_conn() as con:
         sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(uid)
-        log.debug("!!!!!!!!!!!!!!...1 %s", sql)
         con.execute(sql)
 
         sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
-        log.debug("!!!!!!!!!....2 %s", sql)
         con.execute(sql)
 
 
@@ -169,26 +168,35 @@ def is_cr_exists(parts):
     env_list = get_envs()
     log.debug("env_list: %s", env_list)
 
-    for e in env_list:
-        if e["name"] == parts[1]:
-            log.debug("e: %s", e)
-            repo_dir = e["url"].split("/")[-1][:-4]
-            repo_conf = e["conf_file"]
+    k = parts[1]
+    v = env_list.get(k)
 
+    log.debug("e: %s", v)
+    repo_dir = v["url"].split("/")[-1][:-4]
+    repo_conf = v["conf_file"]
 
-            # TODO
-            dir_name = "/tmp/{}/{}/"
+    dir_name = "/tmp/{}/{}".format(k, repo_dir)
+    conf_file = "{}/{}".format(dir_name, repo_conf)
 
-            # dir_name = "/tmp/" + e["name"] + "/{}.yaml".format(parts[2])
+    log.debug("is_cr_exists: dir_name: %s", dir_name)
+    log.debug("is_cr_exists: conf_file: %s", conf_file)
 
-            log.debug("is_cr_exists: dir_name: %s", dir_name)
-            dirt = Path(dir_name)
+    # open conf and check locations
+    with open(conf_file, "r", encoding="utf-8") as f:
+        ydata = yaml.safe_load(f.read())
 
-            if dirt.exists():
-                return True
-            return False
+    log.debug("is_cr_exists: ydata: %s", ydata)
 
-    return False
+    cr_dir = ydata.get("envs", {}).get(k, {}).get("projectset-crds")
+    log.debug("is_cr_exists: cr_dir: %s", cr_dir)
+
+    dirt = Path("{}/{}/{}.yaml".format(dir_name, cr_dir, parts[2]))
+    log.debug("is_cr_exists: dirt: %s", dirt)
+
+    if dirt.exists():
+        return True, dirt
+
+    return False, None
 
 
 def process_state(db, data):
@@ -235,8 +243,10 @@ def process_state(db, data):
 
             log.debug("parts: %s", parts)
 
-            if is_cr_exists(parts):
-                log.debug("found file..deleting..")
+            ok, cr = is_cr_exists(parts)
+
+            if ok:
+                log.debug("found file: %s..deleting..", cr)
 
                 # add new branch
 

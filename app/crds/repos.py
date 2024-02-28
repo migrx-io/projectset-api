@@ -14,7 +14,7 @@ def get_envs():
 
         log.debug("get_envs: data: %s", data)
 
-        envs = data.get('repos', [])
+        envs = data.get('envs', {})
 
         log.debug("get_envs: %s", envs)
 
