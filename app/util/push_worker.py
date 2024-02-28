@@ -5,9 +5,10 @@ from datetime import datetime
 import os
 import base64
 import traceback
-from app.crds.repos import get_envs
 from pathlib import Path
 import yaml
+from app.util.exec import run_shell
+from app.crds.repos import get_envs
 
 
 def show_projectset(db, crd_id):
@@ -190,13 +191,14 @@ def is_cr_exists(parts):
     cr_dir = ydata.get("envs", {}).get(k, {}).get("projectset-crds")
     log.debug("is_cr_exists: cr_dir: %s", cr_dir)
 
-    dirt = Path("{}/{}/{}.yaml".format(dir_name, cr_dir, parts[2]))
+    cr_dir_path = "{}/{}".format(dir_name, cr_dir)
+    dirt = Path("{}/{}.yaml".format(cr_dir_path, parts[2]))
     log.debug("is_cr_exists: dirt: %s", dirt)
 
     if dirt.exists():
-        return True, dirt
+        return True, cr_dir_path, dirt, repo_dir, v
 
-    return False, None
+    return False, None, None, None, None
 
 
 def process_state(db, data):
@@ -243,16 +245,38 @@ def process_state(db, data):
 
             log.debug("parts: %s", parts)
 
-            ok, cr = is_cr_exists(parts)
+            ok, cr_dir, cr, branch, v = is_cr_exists(parts)
 
             if ok:
                 log.debug("found file: %s..deleting..", cr)
 
+                # set url
+                url_auth = "https://{}:{}@{}".format("projectset-api",
+                                                     v["token"], v["url"][8:])
+
                 # add new branch
+                ok, err = run_shell(
+                    "cd {} && git remote set-url origin {}".format(
+                        cr_dir, url_auth))
+
+                # add new branch
+                ok, err = run_shell(
+                    "cd {} && git checkout -b delete_{}".format(
+                        cr_dir, branch))
+
+                log.debug("ok: %s, err: %s", ok, err)
 
                 # delete file
+                ok, err = run_shell(
+                    f"cd {cr_dir} && rm -rf {cr} && git rm {cr} && git commit -m 'Delete {branch}'"
+                )
+                log.debug("ok: %s, err: %s", ok, err)
 
                 # push to origin
+                ok, err = run_shell(
+                    "cd {} && git push origin delete_{}".format(
+                        cr_dir, branch))
+                log.debug("ok: %s, err: %s", ok, err)
 
                 # create MR/PR
 

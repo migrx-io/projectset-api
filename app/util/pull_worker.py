@@ -101,7 +101,7 @@ def clone_pull_repo():
 
         dir_name = "/tmp/" + k
         url_auth = "https://{}:{}@{}".format("projectset-api", v["token"],
-                                             v["url"][7:])
+                                             v["url"][8:])
 
         repo_dir = "{}/{}".format(dir_name, v["url"].split("/")[-1][:-4])
 
@@ -117,7 +117,7 @@ def clone_pull_repo():
 
             # clone to dir
             ok, err = run_shell("cd {} && git clone {}".format(
-                dir_name, v["url"]))
+                dir_name, url_auth))
             log.debug("ok: %s, err: %s", ok, err)
 
         ok, err = run_shell("cd {} && git checkout {}".format(
