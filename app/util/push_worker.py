@@ -85,7 +85,7 @@ def _get_all_tasks(db):
                            FROM tasks
                           """)
         for r in cur:
-            log.debug("_get_all_tasks: %s", r)
+            log.info("_get_all_tasks: %s", r)
             if r["status"] == "PENDING":
                 tasks.append(r)
 
@@ -212,7 +212,7 @@ def is_cr_exists(parts):
 
 def process_state(db, data):
 
-    log.debug("process_state: db: %s, data: %s", db, data)
+    log.info("process_state: db: %s, data: %s", db, data)
 
     if data["op"] in ["CREATE", "UPDATE"]:
 
@@ -221,7 +221,7 @@ def process_state(db, data):
 
             ps = show_projectset(db, data["uuid"])
 
-            log.debug("CREATE: data: %s", ps)
+            log.info("CREATE: data: %s", ps)
 
             parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
 
@@ -229,8 +229,14 @@ def process_state(db, data):
 
             ok, cr_dir, cr, branch, v = is_cr_exists(parts)
 
-            log.debug("not found file: %s..creating..", cr)
+            log.debug("not found file: %s,  %s..creating..", ok, cr)
 
+            if ok:
+                # if file exists - check if not changed
+                with open(f'{cr}', 'r', encoding="utf-8") as f:
+                    if ps["data"] == f.read():
+                        log.debug("file is not changed - skip")
+                        return True
             # set url
             url_auth = "https://{}:{}@{}".format("projectset-api", v["token"],
                                                  v["url"][8:])

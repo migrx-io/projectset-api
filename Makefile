@@ -3,7 +3,7 @@
 #   run: Build code.                                                            
 
 SHELL := /usr/bin/env bash                                                      
-PYLINT_OPTS="C0114,C0116,C0115,W0719,R0903,W0718,C0413,C0411,C0209"
+PYLINT_OPTS="C0114,C0116,C0115,W0719,R0903,W0718,C0413,C0411,C0209,R0915"
 
 .PHONY: all
 all: help

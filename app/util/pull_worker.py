@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from app.crds.repos import get_envs
 from app.util.exec import run_shell
-from app.crds.projectsets import create_projectset
+from app.crds.projectsets import create_projectset, update_projectset_status
 
 # def loop_unfinished_pull(args):
 #     threading.Thread(target=_loop_unfinished_pull, args=(args, ),
@@ -77,6 +77,10 @@ def _parse_clone_dir(repo_url, repo_dir, myaml, remote_br):
             log.debug("exists")
 
             for t in os.listdir(projectset_dir):
+
+                if t.find("gitignore") >= 0:
+                    continue
+
                 # for t in glob.glob("."):
                 log.debug("read projectset: %s", t)
 
@@ -86,7 +90,11 @@ def _parse_clone_dir(repo_url, repo_dir, myaml, remote_br):
                     data = f.read()
 
                     log.debug("DATA: %s", data)
-                    create_projectset(repo_url, name, data, remote_br, True)
+
+                    create_projectset(repo_url, name, data, True)
+
+        # update if remote_dr exists
+        update_projectset_status(repo_url, name, remote_br)
 
 
 def clone_pull_repo():
@@ -187,7 +195,6 @@ def update_branches(repo_dir, v):
 def process_state(db, data):
 
     log.debug("process_state: db: %s, data: %s", db, data)
-
     clone_pull_repo()
 
     return True

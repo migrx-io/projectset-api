@@ -71,7 +71,7 @@ def build_tags(labels):
 #         con.execute(sql)
 
 
-def create_projectset(repo, env, ydata, remote_br, silent=False):
+def create_projectset(repo, env, ydata, silent=False):
 
     log.debug("create_projectset: repo: %s, env: %s data: %s", repo, env,
               ydata)
@@ -89,16 +89,7 @@ def create_projectset(repo, env, ydata, remote_br, silent=False):
     ## if exist - silent return
     _, e = show_projectset(uid)
 
-    if len(e) > 0 and silent and name in remote_br:
-        log.debug("file have not closed PR")
-        with app.db.get_conn() as con:
-            con.execute("""
-                        UPDATE tasks
-                            SET status = '{}'
-                        WHERE uuid = '{}'
-                        """.format("WAITING APPROVE", uid))
-        log.debug("ProjectSet waiting for approval")
-
+    if len(e) > 0 and silent:
         return
 
     if len(e) > 0 and not silent:
@@ -140,9 +131,49 @@ def create_projectset(repo, env, ydata, remote_br, silent=False):
 
         con.execute(sql)
 
-        create_task(app.db, uuid=uid, op="CREATE", status="PENDING")
+        create_task(app.db,
+                    uuid=uid,
+                    type="projectset",
+                    op="CREATE",
+                    status="PENDING")
+        # app.q_push.put({"uuid": uid, "type": "projectset", "op": "CREATE"})
 
-        app.q_push.put({"uuid": uid, "type": "projectset", "op": "CREATE"})
+
+def update_projectset_status(repo, env, remote_br):
+
+    with app.db.get_conn() as con:
+
+        log.debug("exec insert projectset..")
+
+        sql = """SELECT * FROM projectset as ps
+                  WHERE ps.repo  = '{}' AND ps.env = '{}'; """.format(
+            repo, env)
+
+        ps = con.execute(sql)
+
+        uuids = []
+        all_uuids = []
+        for p in ps:
+
+            log.debug("p: %s", p)
+            if p["name"] in remote_br:
+                uuids.append(p["uuid"])
+            else:
+                all_uuids.append(p["uuid"])
+
+        for uid in uuids:
+
+            sql = """UPDATE tasks SET status = 'WAITING_APPROVAL'
+                    WHERE uuid  = '{}';""".format(uid)
+
+            con.execute(sql)
+
+        # update other to finished
+        for uid in all_uuids:
+
+            sql = """UPDATE tasks SET status = 'FINISHED'
+                    WHERE uuid  = '{}';""".format(uid)
+            con.execute(sql)
 
 
 def update_projectset(crd_id, ydata):
