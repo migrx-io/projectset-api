@@ -41,7 +41,7 @@ def pull(req):
     return "ok"
 
 
-def _parse_clone_dir(repo_url, repo_dir, myaml):
+def _parse_clone_dir(repo_url, repo_dir, myaml, remote_br):
 
     log.debug("start working on envs..")
 
@@ -65,8 +65,14 @@ def _parse_clone_dir(repo_url, repo_dir, myaml):
                 # for t in glob.glob("."):
                 log.debug("read template: %s", t)
 
+        #
         # project set
+        #
+
         dirt = Path(projectset_dir)
+        # clear before iterate
+        # clear_projectsets(repo_url, name)
+
         if dirt.exists():
             log.debug("exists")
 
@@ -80,7 +86,7 @@ def _parse_clone_dir(repo_url, repo_dir, myaml):
                     data = f.read()
 
                     log.debug("DATA: %s", data)
-                    create_projectset(repo_url, name, data, True)
+                    create_projectset(repo_url, name, data, remote_br, True)
 
 
 def clone_pull_repo():
@@ -121,21 +127,25 @@ def clone_pull_repo():
         log.debug("ok: %s, err: %s", ok, err)
 
         # update remote and local branches
-        update_branches(repo_dir, v)
+        remote_br = update_branches(repo_dir, v)
 
         # read repo manifest
         manifest_file = "{}/{}".format(repo_dir, v["conf_file"])
 
         log.debug("read manifests file: %s", manifest_file)
 
-        myaml = {}
-        with open(manifest_file, "r", encoding="utf-8") as f:
-            myaml = yaml.safe_load(f)
+        dirt = Path(manifest_file)
+        if dirt.exists():
+            log.debug("exists")
 
-        log.debug("manifest: %s", myaml)
+            myaml = {}
+            with open(manifest_file, "r", encoding="utf-8") as f:
+                myaml = yaml.safe_load(f)
 
-        # iterate thru env
-        _parse_clone_dir(v["url"], repo_dir, myaml)
+            log.debug("manifest: %s", myaml)
+
+            # iterate thru env
+            _parse_clone_dir(v["url"], repo_dir, myaml, remote_br)
 
 
 def update_branches(repo_dir, v):
@@ -163,11 +173,15 @@ def update_branches(repo_dir, v):
     log.debug("update_branches: main is: %s", v["branch"])
 
     for k in local_br:
-        if remote_br.get(k) is None and k != v["branch"]:
+
+        if remote_br.get(k) is None and k.find(v["branch"]) == -1 and k != "":
             # delete branch if not exists
 
+            log.debug("delete branch %s", k)
             ok, err = run_shell("cd {} && git branch -D {}".format(
                 repo_dir, k))
+
+    return remote_br.keys()
 
 
 def process_state(db, data):

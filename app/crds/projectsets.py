@@ -15,7 +15,7 @@ def get_projectset():
 
         log.debug("exec insert projectset..")
 
-        sql = """SELECT ps.*, t.status
+        sql = """SELECT ps.*, t.status, t.op
                  FROM projectset ps, tasks t
                  WHERE ps.uuid = t.uuid"""
 
@@ -48,7 +48,30 @@ def build_tags(labels):
     return label_tags
 
 
-def create_projectset(repo, env, ydata, silent=False):
+# def clear_projectsets(repo, env):
+#     # clear data for refresh from git
+#     with app.db.get_conn() as con:
+#
+#         sql = """DELETE FROM projectset as ps
+#                  WHERE ps.repo = '{}' AND ps.env = '{}'
+#                    AND ps.uuid IN
+#                    (SELECT t.uuid FROM tasks as t WHERE t.status == 'FINISHED')""".format(
+#             repo, env)
+#
+#         log.debug("clear_projectsets: %s", sql)
+#
+#         con.execute(sql)
+#
+#         sql = """DELETE FROM tasks as t
+#                  WHERE t.uuid NOT IN
+#                   (SELECT ps.uuid
+#                   FROM projectset as ps WHERE ps.repo = '{}' AND ps.env = '{}')""".format(
+#             repo, env)
+#
+#         con.execute(sql)
+
+
+def create_projectset(repo, env, ydata, remote_br, silent=False):
 
     log.debug("create_projectset: repo: %s, env: %s data: %s", repo, env,
               ydata)
@@ -65,19 +88,18 @@ def create_projectset(repo, env, ydata, silent=False):
 
     ## if exist - silent return
     _, e = show_projectset(uid)
-    if len(e) > 0 and silent:
 
-        if e[0]["status"] == "FINISHED":
+    if len(e) > 0 and silent and name in remote_br:
+        log.debug("file have not closed PR")
+        with app.db.get_conn() as con:
+            con.execute("""
+                        UPDATE tasks
+                            SET status = '{}'
+                        WHERE uuid = '{}'
+                        """.format("WAITING APPROVE", uid))
+        log.debug("ProjectSet waiting for approval")
 
-            # clear data for refresh from git
-            with app.db.get_conn() as con:
-
-                sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(
-                    uid)
-                con.execute(sql)
-
-                sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
-                con.execute(sql)
+        return
 
     if len(e) > 0 and not silent:
         raise Exception("ProjectSet already exists")

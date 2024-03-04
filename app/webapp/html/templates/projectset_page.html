@@ -19,6 +19,7 @@
         <th>template</th>
         <th>labels</th>
         <th>annotations</th>
+        <th>op</th>
         <th>status</th>
       </tr>
     </thead>
@@ -39,6 +40,7 @@
                 <span class="badge bg-secondary rounded-pill">{{tag}}</span>
               {% endfor %}
           </td>
+          <td>{{ i.op }}</td>
           <td>{{ i.status }}</td>
         </tr>
       {% endfor %}

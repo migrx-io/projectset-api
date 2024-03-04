@@ -36,7 +36,7 @@ def create():
         log.debug("create: data: %s", data)
 
         try:
-            create_projectset(repo, env, data)
+            create_projectset(repo, env, data, [])
 
         except Exception as e:
             return {"error": str(e)}

@@ -3,13 +3,13 @@ envs:
     description: Dev repo for dev/preprod clusters
     url: https://github.com/migrx-io/projectset-crds.git
     branch: main
-    token: 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
+    token: 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
     conf_file: projectsets.yaml
   prod-ocp-cluster:
     description: Prod repo for production clusters
     url: https://github.com/migrx-io/projectset-crds.git
     branch: main  
-    token: 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
+    token: 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
     conf_file: projectsets.yaml
 
 roles:

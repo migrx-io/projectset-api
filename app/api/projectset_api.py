@@ -27,7 +27,7 @@ def projectset_create():
 
     data = request.get_json()
 
-    create_projectset(data.get("repo"), data.get("name"), data.get("data"))
+    create_projectset(data.get("repo"), data.get("name"), data.get("data"), [])
 
     return jsonify("ok"), 200
 

@@ -85,8 +85,8 @@ def _get_all_tasks(db):
                            FROM tasks
                           """)
         for r in cur:
-            log.debug(r)
-            if r["status"] not in ["FINISHED"]:
+            log.debug("_get_all_tasks: %s", r)
+            if r["status"] == "PENDING":
                 tasks.append(r)
 
     return tasks
@@ -108,7 +108,12 @@ def _loop_unfinished_tasks(args):
         try:
             tasks = _get_all_tasks(db)
             for t in tasks:
+
+                log.debug("_loop_unfinished_tasks: %s", t)
                 q.put({"uuid": t["uuid"], "type": t["type"], "op": t["op"]})
+
+            # wait between push and pull
+            time.sleep(5)
 
             # trigger pull
             q_pull.put("ping")
@@ -202,40 +207,71 @@ def is_cr_exists(parts):
     if dirt.exists():
         return True, cr_dir_path, dirt, parts[2], v
 
-    return False, None, None, None, None
+    return False, cr_dir_path, dirt, parts[2], v
 
 
 def process_state(db, data):
 
     log.debug("process_state: db: %s, data: %s", db, data)
 
-    if data["op"] == "CREATE":
+    if data["op"] in ["CREATE", "UPDATE"]:
 
         # check if exists and eq
-
         if data["type"] == "projectset":
-            data = show_projectset(db, data["uuid"])
 
-            log.debug("CREATE: data: %s", data)
+            ps = show_projectset(db, data["uuid"])
 
-        # add new branch
+            log.debug("CREATE: data: %s", ps)
 
-        # create file
+            parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
 
-        # push to origin
+            log.debug("parts: %s", parts)
 
-        # create MR/PR
+            ok, cr_dir, cr, branch, v = is_cr_exists(parts)
 
-    elif data["op"] == "UPDATE":
+            log.debug("not found file: %s..creating..", cr)
 
-        # add new branch
+            # set url
+            url_auth = "https://{}:{}@{}".format("projectset-api", v["token"],
+                                                 v["url"][8:])
 
-        # create file
+            # add new branch
+            ok, err = run_shell("cd {} && git remote set-url origin {}".format(
+                cr_dir, url_auth))
 
-        # push to origin
+            log.debug("ok: %s, err: %s", ok, err)
 
-        # create MR/PR
-        pass
+            # add new branch
+            ok, err = run_shell("cd {} && git checkout -b {}".format(
+                cr_dir, branch))
+
+            log.debug("ok: %s, err: %s", ok, err)
+
+            # create file
+            with open(f'{cr}', 'w+', encoding="utf-8") as f:
+                f.write(ps["data"])
+
+            ok, err = run_shell(
+                f"cd {cr_dir} && git add {cr} && git commit -m 'Create {branch}'"
+            )
+            log.debug("ok: %s, err: %s", ok, err)
+
+            # push to origin
+            ok, err = run_shell("cd {} && git push origin {}".format(
+                cr_dir, branch))
+            log.debug("ok: %s, err: %s", ok, err)
+
+            ok, err = run_shell("cd {} && git checkout {}".format(
+                cr_dir, v["branch"]))
+            log.debug("ok: %s, err: %s", ok, err)
+
+            # create MR/PR
+
+            url_parts = v["url"].split("/")
+
+            create_pull_request(v["token"], url_parts[3], url_parts[-1][:-4],
+                                f"Create {branch}", f"Delete {branch}",
+                                f"{branch}", v["branch"])
 
     elif data["op"] == "DELETE":
 
@@ -266,9 +302,8 @@ def process_state(db, data):
                 log.debug("ok: %s, err: %s", ok, err)
 
                 # add new branch
-                ok, err = run_shell(
-                    "cd {} && git checkout -b delete_{}".format(
-                        cr_dir, branch))
+                ok, err = run_shell("cd {} && git checkout -b {}".format(
+                    cr_dir, branch))
 
                 log.debug("ok: %s, err: %s", ok, err)
 
@@ -279,9 +314,8 @@ def process_state(db, data):
                 log.debug("ok: %s, err: %s", ok, err)
 
                 # push to origin
-                ok, err = run_shell(
-                    "cd {} && git push origin delete_{}".format(
-                        cr_dir, branch))
+                ok, err = run_shell("cd {} && git push origin {}".format(
+                    cr_dir, branch))
                 log.debug("ok: %s, err: %s", ok, err)
 
                 ok, err = run_shell("cd {} && git checkout {}".format(
@@ -293,8 +327,8 @@ def process_state(db, data):
                 url_parts = v["url"].split("/")
 
                 create_pull_request(v["token"], url_parts[3],
-                                    url_parts[-1][:-4], "Delete {branch}",
-                                    "Delete {branch}", "delete_{branch}",
+                                    url_parts[-1][:-4], f"Delete {branch}",
+                                    f"Delete {branch}", f"{branch}",
                                     v["branch"])
 
             else:
