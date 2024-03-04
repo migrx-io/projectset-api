@@ -67,8 +67,6 @@ def create_projectset(repo, env, ydata, silent=False):
     _, e = show_projectset(uid)
     if len(e) > 0 and silent:
 
-        # log.debug("\n\n\n\n\!!!!!!!!!!!! %s \n\n\n\n", e )
-
         if e[0]["status"] == "FINISHED":
 
             # clear data for refresh from git
@@ -76,11 +74,9 @@ def create_projectset(repo, env, ydata, silent=False):
 
                 sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(
                     uid)
-                log.debug("!!!!!!!!!!!!!!...1 %s", sql)
                 con.execute(sql)
 
                 sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
-                log.debug("!!!!!!!!!....2 %s", sql)
                 con.execute(sql)
 
     if len(e) > 0 and not silent:

@@ -123,14 +123,13 @@ def clone_pull_repo():
                 dir_name, url_auth))
             log.debug("ok: %s, err: %s", ok, err)
 
-        ok, err = run_shell("cd {} && git checkout {}".format(
+        # checkout to main before pull
+        ok, err = run_shell("cd {} && git checkout {} && git pull".format(
             repo_dir, v["branch"]))
         log.debug("ok: %s, err: %s", ok, err)
 
-        # checkout to main before pull
-        ok, err = run_shell("cd {} git checkout {} && git pull".format(
-            repo_dir, v["branch"]))
-        log.debug("ok: %s, err: %s", ok, err)
+        # update remote and local branches
+        update_branches(repo_dir, v)
 
         # read repo manifest
         manifest_file = "{}/{}".format(repo_dir, v["conf_file"])
@@ -145,6 +144,39 @@ def clone_pull_repo():
 
         # iterate thru env
         _parse_clone_dir(v["url"], repo_dir, myaml)
+
+
+def update_branches(repo_dir, v):
+
+    # prune remote first
+    ok, err = run_shell("cd {} && git fetch origin --prune".format(
+            repo_dir, v["branch"]))
+
+    ok, data = run_shell("cd {} && git branch -a".format(
+            repo_dir, v["branch"]))
+
+    local_br = {}
+    remote_br = {}
+
+    for i in data.decode("utf-8").split("\n"):
+        log.debug("update_branches: %s", i)
+
+        branch = i.split("/")
+        if i.find("remotes/origin") != -1:
+            remote_br[branch[2]] = True
+        else:
+            local_br[branch[0]] = True
+
+    log.debug("update_branches: local_br: %s , remote_br: %s", local_br, remote_br)
+    log.debug("update_branches: main is: %s", v["branch"])
+
+    for k in local_br.keys():
+        if remote_br.get(k) is None and k != v["branch"]:
+            # delete branch if not exists
+
+            ok, err = run_shell("cd {} && git branch -D {}".format(
+                    repo_dir, k))
+
 
 
 def process_state(db, data):

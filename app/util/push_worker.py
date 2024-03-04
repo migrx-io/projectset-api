@@ -259,6 +259,8 @@ def process_state(db, data):
                     "cd {} && git remote set-url origin {}".format(
                         cr_dir, url_auth))
 
+                log.debug("ok: %s, err: %s", ok, err)
+
                 # add new branch
                 ok, err = run_shell(
                     "cd {} && git checkout -b delete_{}".format(
@@ -272,21 +274,52 @@ def process_state(db, data):
                 )
                 log.debug("ok: %s, err: %s", ok, err)
 
+                # TODO
+                return
+
                 # push to origin
                 ok, err = run_shell(
                     "cd {} && git push origin delete_{}".format(
                         cr_dir, branch))
                 log.debug("ok: %s, err: %s", ok, err)
 
-                ok, err = run_shell(
-                    "cd {} && git checkout {} && git branch -D delete_{}".
-                    format(cr_dir, branch, v["branch"]))
+                ok, err = run_shell("cd {} && git checkout {}".format(
+                    cr_dir, v["branch"]))
                 log.debug("ok: %s, err: %s", ok, err)
 
                 # create MR/PR
+
+                url_parts = v["url"].split("/")
+
+                create_pull_request(v["token"], url_parts[3],
+                                    url_parts[-1][:-4], "Delete {branch}",
+                                    "Delete {branch}", "delete_{branch}",
+                                    v["branch"])
 
             else:
                 log.debug("file not found. clear table")
                 clear_tables(db, data["uuid"])
 
     return True
+
+
+#
+# Github PR
+#
+def create_pull_request(token, owner, repo, title, body, dest, source):
+
+    cmd = """
+    curl -L \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer {}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    https://api.github.com/repos/{}/{}/pulls \
+    -d '{{"title":"{}","body":"{}","head":"{}","base":"{}"}}'
+    """.format(token, owner, repo, title, body, dest, source)
+
+    log.debug("create_pull_request: cmd: %s", cmd)
+
+    ok, err = run_shell(cmd)
+
+    log.debug("ok: %s, err: %s", ok, err)
