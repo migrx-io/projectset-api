@@ -25,7 +25,13 @@
     </thead>
     <tbody>
       {% for i in projectset_list %}
+
+      {% if i.status != "FINISHED" %}
+        <tr class="bg-warning">
+       {% else %}
         <tr>
+       {% endif %}
+
           <td>{{ i.repo }}</td>
           <td>{{ i.env }}</td>
           <td>{{ i.name }}</td>

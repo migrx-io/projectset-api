@@ -140,14 +140,14 @@ def push(req):
 
         log.debug("process_state: result: %s", ok)
 
-        if ok:
-            update_task(db,
-                        uuid=data["uuid"],
-                        op=data["op"],
-                        status="FINISHED",
-                        error="",
-                        date_type="date_end",
-                        date=datetime.now())
+        # if ok:
+        #     update_task(db,
+        #                 uuid=data["uuid"],
+        #                 op=data["op"],
+        #                 status="FINISHED",
+        #                 error="",
+        #                 date_type="date_end",
+        #                 date=datetime.now())
 
     except Exception as e:
         log.error("process_state: ERROR: %s \n %s", e, traceback.format_exc())
