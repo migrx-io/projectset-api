@@ -99,7 +99,7 @@ def loop_unfinished_tasks(args):
 
 def _loop_unfinished_tasks(args):
 
-    db, q = args[0], args[1]
+    db, q, q_pull = args[0], args[1], args[2]
 
     while True:
 
@@ -109,6 +109,10 @@ def _loop_unfinished_tasks(args):
             tasks = _get_all_tasks(db)
             for t in tasks:
                 q.put({"uuid": t["uuid"], "type": t["type"], "op": t["op"]})
+
+            # trigger pull
+            q_pull.put("ping")
+
         except Exception as e:
             log.error("_loop_unfinished_tasks: %s", e)
 
@@ -274,9 +278,6 @@ def process_state(db, data):
                 )
                 log.debug("ok: %s, err: %s", ok, err)
 
-                # TODO
-                return
-
                 # push to origin
                 ok, err = run_shell(
                     "cd {} && git push origin delete_{}".format(
@@ -306,7 +307,9 @@ def process_state(db, data):
 #
 # Github PR
 #
-def create_pull_request(token, owner, repo, title, body, dest, source):
+def create_pull_request(*args):
+
+    token, owner, repo, title, body, dest, source = args
 
     cmd = """
     curl -L \

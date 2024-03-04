@@ -1,6 +1,4 @@
 import logging as log
-import time
-import threading
 import os
 import traceback
 from pathlib import Path
@@ -9,23 +7,17 @@ from app.crds.repos import get_envs
 from app.util.exec import run_shell
 from app.crds.projectsets import create_projectset
 
+# def loop_unfinished_pull(args):
+#     threading.Thread(target=_loop_unfinished_pull, args=(args, ),
+#                      daemon=True).start()
 
-def loop_unfinished_pull(args):
-    threading.Thread(target=_loop_unfinished_pull, args=(args, ),
-                     daemon=True).start()
-
-
-def _loop_unfinished_pull(args):
-
-    _, q = args[0], args[1]
-
-    while True:
-
-        log.debug("start loop_unfinished_pull..")
-
-        q.put("ping")
-
-        time.sleep(int(os.environ.get("PWORKERS_SLEEP", "15")))
+# def _loop_unfinished_pull(args):
+#
+#     _, q = args[0], args[1]
+#     while True:
+#         log.debug("start loop_unfinished_pull..")
+#         q.put("ping")
+#         time.sleep(int(os.environ.get("PWORKERS_SLEEP", "15")))
 
 
 def pull(req):
@@ -149,11 +141,10 @@ def clone_pull_repo():
 def update_branches(repo_dir, v):
 
     # prune remote first
-    ok, err = run_shell("cd {} && git fetch origin --prune".format(
-            repo_dir, v["branch"]))
+    ok, err = run_shell("cd {} && git fetch origin --prune".format(repo_dir))
+    log.debug("prune: ok: %s err: %s", ok, err)
 
-    ok, data = run_shell("cd {} && git branch -a".format(
-            repo_dir, v["branch"]))
+    _, data = run_shell("cd {} && git branch -a".format(repo_dir))
 
     local_br = {}
     remote_br = {}
@@ -167,16 +158,16 @@ def update_branches(repo_dir, v):
         else:
             local_br[branch[0]] = True
 
-    log.debug("update_branches: local_br: %s , remote_br: %s", local_br, remote_br)
+    log.debug("update_branches: local_br: %s , remote_br: %s", local_br,
+              remote_br)
     log.debug("update_branches: main is: %s", v["branch"])
 
-    for k in local_br.keys():
+    for k in local_br:
         if remote_br.get(k) is None and k != v["branch"]:
             # delete branch if not exists
 
             ok, err = run_shell("cd {} && git branch -D {}".format(
-                    repo_dir, k))
-
+                repo_dir, k))
 
 
 def process_state(db, data):

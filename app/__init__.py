@@ -27,7 +27,7 @@ from app.webapp.projectset_page import projectset_page
 
 from app.util.pool import Pool
 from app.util.push_worker import push, loop_unfinished_tasks
-from app.util.pull_worker import pull, loop_unfinished_pull
+from app.util.pull_worker import pull
 
 from app.util.db import DB
 
@@ -111,13 +111,13 @@ with app.app_context():
     q_pull = queue.Queue()
     pool = Pool(int(os.environ.get("PWORKERS", "1")), pull, [db, q_pull])
     pool.start()
-    loop_unfinished_pull([db, q_pull])
 
     # Git push worker
     q_push = queue.Queue()
     pool = Pool(int(os.environ.get("PWORKERS", "1")), push, [db, q_push])
     pool.start()
-    loop_unfinished_tasks([db, q_push])
+
+    loop_unfinished_tasks([db, q_push, q_pull])
 
 # Register blueprint(s)
 
