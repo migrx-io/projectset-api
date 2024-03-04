@@ -181,6 +181,12 @@ def update_projectset(crd_id, ydata):
 
     data = yaml.safe_load(ydata)
 
+    ## if exist - silent return
+    _, e = show_projectset(crd_id)
+
+    if len(e) > 0 and e[0]["status"] != "FINISHED":
+        raise Exception("There is one PR already exists")
+
     log.debug("update data: %s", data)
 
     with app.db.get_conn() as con:
@@ -240,6 +246,12 @@ def show_projectset(crd_id):
 
 def delete_projectset(crd_id):
     log.debug("delete_projectset: crd_id %s", crd_id)
+
+    ## if exist - silent return
+    _, e = show_projectset(crd_id)
+
+    if len(e) > 0 and e[0]["status"] != "FINISHED":
+        raise Exception("There is one PR already exists")
 
     update_task(app.db,
                 uuid=crd_id,

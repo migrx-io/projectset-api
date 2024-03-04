@@ -85,7 +85,7 @@ def _get_all_tasks(db):
                            FROM tasks
                           """)
         for r in cur:
-            log.info("_get_all_tasks: %s", r)
+            log.debug("_get_all_tasks: %s", r)
             if r["status"] == "PENDING":
                 tasks.append(r)
 
@@ -212,7 +212,7 @@ def is_cr_exists(parts):
 
 def process_state(db, data):
 
-    log.info("process_state: db: %s, data: %s", db, data)
+    log.debug("process_state: db: %s, data: %s", db, data)
 
     if data["op"] in ["CREATE", "UPDATE"]:
 
@@ -221,7 +221,7 @@ def process_state(db, data):
 
             ps = show_projectset(db, data["uuid"])
 
-            log.info("CREATE: data: %s", ps)
+            log.debug("CREATE: data: %s", ps)
 
             parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
 
@@ -258,7 +258,7 @@ def process_state(db, data):
                 f.write(ps["data"])
 
             ok, err = run_shell(
-                f"cd {cr_dir} && git add {cr} && git commit -m 'Create {branch}'"
+                f"cd {cr_dir} && git add {cr} && git commit -m 'Create/update {branch}'"
             )
             log.debug("ok: %s, err: %s", ok, err)
 
@@ -276,8 +276,9 @@ def process_state(db, data):
             url_parts = v["url"].split("/")
 
             create_pull_request(v["token"], url_parts[3], url_parts[-1][:-4],
-                                f"Create {branch}", f"Delete {branch}",
-                                f"{branch}", v["branch"])
+                                f"Create/update {branch}",
+                                f"Create/update {branch}", f"{branch}",
+                                v["branch"])
 
     elif data["op"] == "DELETE":
 
