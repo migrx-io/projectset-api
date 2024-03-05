@@ -16,6 +16,51 @@ export APP_CONF=./app.yaml
 
 ```
 
+### App config 
+
+app.yaml
+
+```
+envs:
+  test-ocp-cluster:
+    description: Dev repo for dev/preprod clusters
+    url: https://github.com/migrx-io/projectset-crds.git
+    branch: main
+    token: ghp_Osa...
+    conf_file: projectsets.yaml
+  prod-ocp-cluster:
+    description: Prod repo for production clusters
+    url: https://github.com/migrx-io/projectset-crds.git
+    branch: main  
+    token: ghp_Osa...
+    conf_file: projectsets.yaml
+
+roles:
+  user:
+    projectset:
+      edit:
+        - labels
+        - annotations
+        - namespace
+        - template
+  admin:
+    projectset:
+      edit:
+        - labels
+        - annotations
+        - namespace
+        - template
+    projectsettemplate:
+      edit:
+        - labels
+        - annotations
+        - namespace
+
+
+```
+
+
+
 ## Development
 
 ### Run locally
