@@ -4,6 +4,7 @@
 
 SHELL := /usr/bin/env bash                                                      
 PYLINT_OPTS="C0114,C0116,C0115,W0719,R0903,W0718,C0413,C0411,C0209,R0915,R0801"
+VERSION=0.1.0
 
 .PHONY: all
 all: help
@@ -21,3 +22,13 @@ run:
 tests:
 	find . -type f -name "*.py" |xargs ${PYENV}/python3 -m yapf -i
 	find . -type f -name "*.py" |xargs ${PYENV}/python3 -m pylint --unsafe-load-any-extension=y --disable ${PYLINT_OPTS}
+
+.PHONY: docker-build
+docker-build:
+	docker build -t projectset-api:${VERSION} .
+
+.PHONY: docker-push
+docker-push:
+	docker push projectset-api:${VERSION}
+
+
