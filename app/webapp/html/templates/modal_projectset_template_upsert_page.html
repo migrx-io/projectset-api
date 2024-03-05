@@ -1,42 +1,19 @@
 <form id="ModalForm" name="stepForm" class="form" method="post">
     <div class="modal-header">
-        <h4 class="modal-title">ProjectSet CRD</h4>
+        <h4 class="modal-title">ProjectSet Template CRD</h4>
     </div>
     <div class="modal-body">
-        <h6>Example CRD from Template</h6>
-        <i>You can define ProjectSetTemplate and reference it (<b>template</b>) to create ProjectSet</i>
-        <div class="mb-3">
-        <textarea class="form-control" rows="1" disabled readonly>
-apiVersion: project.migrx.io/v1alpha1
-kind: ProjectSet
-metadata:
-  annotations:
-    app.kubernetes.io/name: projectset
-  name: devteam-projectset
-spec:
-  namespace: dev-app
-  labels:
-    app: frontend
-    stage: dev
-  annotations:
-    app.kubernetes.io/name: dev-app
-    app.kubernetes.io/lang: golang
-  template: dev-small
-        </textarea>
-        </div>
-        <h6>Example CRD</h6>
-        <i>Create a ProjectSet with all defined resources (template data will be overwritten if a template is defined)</i>
+        <h6>Example Template CRD</h6>
+        <i>Create a ProjectSet Template</i>
         <div class="mb-3 ">
         <textarea class="form-control" rows="1" disabled readonly>
 apiVersion: project.migrx.io/v1alpha1
-kind: ProjectSet
+kind: ProjectSetTemplate
 metadata:
   annotations:
-    app.kubernetes.io/name: projectset
-  name: devteam-projectset
+    app.kubernetes.io/name: projectsettemplate
+  name: devteam-template
 spec:
-  namespace: dev-app
-
   labels:
     app: frontend
     stage: dev

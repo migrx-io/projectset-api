@@ -13,7 +13,7 @@ def projectset():
     file: ../apispec/projectset_list.yaml
     """
 
-    projectset_list = get_projectset()
+    projectset_list = get_projectset("projectset")
 
     return jsonify(projectset_list), 200
 
@@ -27,7 +27,8 @@ def projectset_create():
 
     data = request.get_json()
 
-    create_projectset(data.get("repo"), data.get("name"), data.get("data"), [])
+    create_projectset("projectset", data.get("repo"), data.get("name"),
+                      data.get("data"), [])
 
     return jsonify("ok"), 200
 
@@ -41,7 +42,7 @@ def projectset_update(uid):
 
     data = request.data.decode("utf-8")
 
-    update_projectset(uid, data)
+    update_projectset("projectset", uid, data)
 
     return jsonify("ok"), 200
 
@@ -53,6 +54,59 @@ def projectset_delete(uid):
     file: ../apispec/projectset_delete.yaml
     """
 
-    delete_projectset(uid)
+    delete_projectset("projectset", uid)
+
+    return jsonify("ok"), 200
+
+
+@projectset_api.route('/projectsettemplate', methods=['GET'])
+@jwt_required(False)
+def projectsettemplate():
+    """
+    file: ../apispec/projectsettemplate_list.yaml
+    """
+
+    projectset_list = get_projectset("projectset_template")
+
+    return jsonify(projectset_list), 200
+
+
+@projectset_api.route('/projectsettemplate', methods=['POST'])
+@jwt_required(False)
+def projectsettemplate_create():
+    """
+    file: ../apispec/projectsettemplate_create.yaml
+    """
+
+    data = request.get_json()
+
+    create_projectset("projectset_template", data.get("repo"),
+                      data.get("name"), data.get("data"), [])
+
+    return jsonify("ok"), 200
+
+
+@projectset_api.route('/projectsettemplate/<uid>', methods=['PUT'])
+@jwt_required(False)
+def projectsettemplate_update(uid):
+    """
+    file: ../apispec/projectsettemplate_update.yaml
+    """
+
+    data = request.data.decode("utf-8")
+
+    update_projectset("projectset_template", uid, data)
+
+    return jsonify("ok"), 200
+
+
+@projectset_api.route('/projectsettemplate/<uid>', methods=['DELETE'])
+@jwt_required(False)
+def projectsettemplate_delete(uid):
+    """
+    file: ../apispec/projectsettemplate_delete.yaml
+    """
+
+    delete_projectset("projectset_template", uid)
 
     return jsonify("ok"), 200

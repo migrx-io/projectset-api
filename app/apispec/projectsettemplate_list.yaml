@@ -1,0 +1,35 @@
+Get projectset template list
+Get projectset template list
+---
+tags:
+  - ProjectsetTemplate
+
+produces:
+  - application/json
+
+responses:
+  200:
+    description: "Projectset list"
+    schema:
+
+      type: array
+      items:
+        type: object
+        properties:
+          cluster:
+            type: string
+            description: Projectset name
+      example:
+        [{'name': 'main'}]
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}

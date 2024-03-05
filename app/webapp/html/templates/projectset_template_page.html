@@ -1,22 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>ProjectSet CRs</h3>
+<h3>ProjectSet Template CRs</h3>
 <button id="create_projectset" class="edit-modal-opener btn btn-success" 
    data-toggle="modal"
-   data-whatever="{{ url_for('projectset_page.create') }}" href="#">Create</button>
+   data-whatever="{{ url_for('projectset_template_page.create') }}" href="#">Create</button>
 <button id="delete_projectset" class="edit-modal-confirm-opener btn btn-danger" 
    data-toggle="modal"
    href="#">Delete</button>
 <hr>
 <div class="container-fluid">
 
-  <table id="data" class="table by_env projectset">
+  <table id="data" class="table by_env projectsettemplate">
     <thead>
       <tr>
         <th>repo</th>
         <th>enviroment</th>
         <th>name</th>
-        <th>template</th>
         <th>labels</th>
         <th>annotations</th>
         <th>op</th>
@@ -35,7 +34,6 @@
           <td>{{ i.repo }}</td>
           <td>{{ i.env }}</td>
           <td>{{ i.name }}</td>
-          <td>{{ i.template }}</td>
           <td>
               {% for tag in i.labels %}
                 <span class="badge bg-secondary rounded-pill">{{tag}}</span>

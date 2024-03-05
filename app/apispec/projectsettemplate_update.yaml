@@ -1,0 +1,38 @@
+Update projectset template
+Update projectset template
+---
+tags:
+  - ProjectsetTemplate
+
+produces:
+  - application/json
+
+parameters:
+
+  - in: path
+    name: uuid
+    description: "UUID projectset template"
+    required: true
+
+  - in: body
+    name: request
+    description: "Request"
+    required: true
+    schema:
+      type: string
+
+responses:
+  200:
+    description: "Result status"
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}

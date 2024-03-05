@@ -20,7 +20,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('projectset_page.projectset') }}">ProjectSet CRDs</a>
+              <a class="nav-link" href="{{ url_for('projectset_page.projectset') }}">ProjectSet CRs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('projectset_template_page.projectset') }}">ProjectSetTemplates CRs</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('repo_page.repo') }}">Enviroments</a>
@@ -112,6 +115,9 @@
 
             var url = "/projectset/edit/" + btoa(crd_id)
 
+            if ($("table").hasClass("projectsettemplate")){
+                url = "/projectsettemplate/edit/" + btoa(crd_id)
+            }
 
             $.get(url, function (data) {
 
@@ -176,6 +182,10 @@
                 confirm('Are you sure you want delete instance?')
 
                 var url = "/projectset/delete/" + btoa(crd_id)
+
+                if ($("table").hasClass("projectsettemplate")){
+                    url = "/projectsettemplate/edit/" + btoa(crd_id)
+                }
 
                 $.post(url, function (data) {
                     if (data.status == 'ok') {

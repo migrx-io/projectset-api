@@ -24,6 +24,7 @@ from app.api.repo_api import repo_api
 from app.webapp.login_page import login_page
 from app.webapp.repo_page import repo_page
 from app.webapp.projectset_page import projectset_page
+from app.webapp.projectset_template_page import projectset_template_page
 
 from app.util.pool import Pool
 from app.util.push_worker import push, loop_unfinished_tasks
@@ -131,6 +132,7 @@ app.register_blueprint(repo_api, url_prefix='/api/v1/')
 app.register_blueprint(login_page, url_prefix='/')
 app.register_blueprint(repo_page, url_prefix='/repo')
 app.register_blueprint(projectset_page, url_prefix='/projectset')
+app.register_blueprint(projectset_template_page, url_prefix='/projectsettemplate')
 
 # Common errors
 app.register_error_handler(500, handle_internal_error)

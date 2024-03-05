@@ -1,0 +1,33 @@
+Create projectset template
+Create projectset template
+---
+tags:
+  - ProjectsetTemplate
+
+produces:
+  - application/json
+
+parameters:
+
+  - in: body
+    name: request
+    description: "Request"
+    required: true
+    schema:
+      type: object
+
+responses:
+  200:
+    description: "Result status"
+
+  500:
+    description: "Error response"
+    schema:
+
+      properties:
+        error:
+          type: string
+          description: Error message
+
+      example:
+        {"error": "Error occured"}

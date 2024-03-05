@@ -6,7 +6,7 @@ from app.util.push_worker import create_task, update_task
 import json
 
 
-def get_projectset():
+def get_projectset(typ):
 
     crds = []
 
@@ -16,8 +16,8 @@ def get_projectset():
         log.debug("exec insert projectset..")
 
         sql = """SELECT ps.*, t.status, t.op
-                 FROM projectset ps, tasks t
-                 WHERE ps.uuid = t.uuid"""
+                 FROM {} ps, tasks t
+                 WHERE ps.uuid = t.uuid""".format(typ)
 
         log.debug("sql: %s", sql)
 
@@ -71,7 +71,7 @@ def build_tags(labels):
 #         con.execute(sql)
 
 
-def create_projectset(repo, env, ydata, silent=False):
+def create_projectset(typ, repo, env, ydata, silent=False):
 
     log.debug("create_projectset: repo: %s, env: %s data: %s", repo, env,
               ydata)
@@ -87,7 +87,7 @@ def create_projectset(repo, env, ydata, silent=False):
     log.debug("uid: %s", uid)
 
     ## if exist - silent return
-    _, e = show_projectset(uid)
+    _, e = show_projectset(typ, uid)
 
     if len(e) > 0 and silent:
         return
@@ -100,54 +100,77 @@ def create_projectset(repo, env, ydata, silent=False):
 
         log.debug("exec insert projectset..")
 
-        sql = """INSERT OR IGNORE INTO
-                                  projectset(
-                                        uuid,
-                                        repo,
-                                        env,
-                                        name,
-                                        template,
-                                        labels,
-                                        annotations,
-                                        data)
-                              VALUES('{}',
-                                     '{}',
-                                     '{}',
-                                     '{}',
-                                     '{}',
-                                     '{}',
-                                     '{}',
-                                     '{}'
-                                     );
+        if typ == "projectset":
 
-                               """.format(
-            uid, repo, env, name,
-            data.get("spec", {}).get("template"),
-            json.dumps(build_tags(data.get("spec", {}).get("labels"))),
-            json.dumps(build_tags(data.get("spec", {}).get("annotations"))),
-            ydata)
+            sql = """INSERT OR IGNORE INTO
+                                    projectset(
+                                            uuid,
+                                            repo,
+                                            env,
+                                            name,
+                                            template,
+                                            labels,
+                                            annotations,
+                                            data)
+                                VALUES('{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}'
+                                        );
+
+                                """.format(
+                uid, repo, env, name,
+                data.get("spec", {}).get("template"),
+                json.dumps(build_tags(data.get("spec", {}).get("labels"))),
+                json.dumps(build_tags(data.get("spec",
+                                               {}).get("annotations"))), ydata)
+
+        else:
+            sql = """INSERT OR IGNORE INTO
+                                    projectset_template(
+                                            uuid,
+                                            repo,
+                                            env,
+                                            name,
+                                            labels,
+                                            annotations,
+                                            data)
+                                VALUES('{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}',
+                                        '{}'
+                                        );
+
+                                """.format(
+                uid, repo, env, name,
+                json.dumps(build_tags(data.get("spec", {}).get("labels"))),
+                json.dumps(build_tags(data.get("spec",
+                                               {}).get("annotations"))), ydata)
 
         log.debug("sql: %s", sql)
 
         con.execute(sql)
 
-        create_task(app.db,
-                    uuid=uid,
-                    type="projectset",
-                    op="CREATE",
-                    status="PENDING")
+        create_task(app.db, uuid=uid, type=typ, op="CREATE", status="PENDING")
         # app.q_push.put({"uuid": uid, "type": "projectset", "op": "CREATE"})
 
 
-def update_projectset_status(repo, env, remote_br):
+def update_projectset_status(typ, repo, env, remote_br):
 
     with app.db.get_conn() as con:
 
         log.debug("exec insert projectset..")
 
-        sql = """SELECT * FROM projectset as ps
+        sql = """SELECT * FROM {} as ps
                   WHERE ps.repo  = '{}' AND ps.env = '{}'; """.format(
-            repo, env)
+            typ, repo, env)
 
         ps = con.execute(sql)
 
@@ -176,13 +199,13 @@ def update_projectset_status(repo, env, remote_br):
             con.execute(sql)
 
 
-def update_projectset(crd_id, ydata):
+def update_projectset(typ, crd_id, ydata):
     log.debug("update_projectset: crd_id: %s,data %s", crd_id, ydata)
 
     data = yaml.safe_load(ydata)
 
     ## if exist - silent return
-    _, e = show_projectset(crd_id)
+    _, e = show_projectset(typ, crd_id)
 
     if len(e) > 0 and e[0]["status"] != "FINISHED":
         raise Exception("There is one PR already exists")
@@ -193,15 +216,32 @@ def update_projectset(crd_id, ydata):
 
         log.debug("exec insert projectset..")
 
-        sql = """UPDATE projectset SET data = '{}',
-                                       labels = '{}',
-                                       annotations = '{}',
-                                       template = '{}'
-                 WHERE uuid = '{}'
-                               """.format(
-            ydata, json.dumps(build_tags(data.get("spec", {}).get("labels"))),
-            json.dumps(build_tags(data.get("spec", {}).get("annotations"))),
-            data.get("spec", {}).get("template"), crd_id)
+        if typ == "projectset":
+
+            sql = """UPDATE projectset SET data = '{}',
+                                        labels = '{}',
+                                        annotations = '{}',
+                                        template = '{}'
+                    WHERE uuid = '{}'
+                                """.format(
+                ydata,
+                json.dumps(build_tags(data.get("spec", {}).get("labels"))),
+                json.dumps(build_tags(data.get("spec",
+                                               {}).get("annotations"))),
+                data.get("spec", {}).get("template"), crd_id)
+
+        else:
+
+            sql = """UPDATE projectset_template SET data = '{}',
+                                        labels = '{}',
+                                        annotations = '{}',
+                    WHERE uuid = '{}'
+                                """.format(
+                ydata,
+                json.dumps(build_tags(data.get("spec", {}).get("labels"))),
+                json.dumps(build_tags(data.get("spec",
+                                               {}).get("annotations"))),
+                crd_id)
 
         log.debug("update sql: %s", sql)
 
@@ -213,10 +253,10 @@ def update_projectset(crd_id, ydata):
                 status="PENDING",
                 date_type="date_begin")
 
-    app.q_push.put({"uuid": crd_id, "type": "projectset", "op": "UPDATE"})
+    app.q_push.put({"uuid": crd_id, "type": typ, "op": "UPDATE"})
 
 
-def show_projectset(crd_id):
+def show_projectset(typ, crd_id):
     log.debug("show_projectset: crd_id %s", crd_id)
 
     dyaml = ""
@@ -227,8 +267,9 @@ def show_projectset(crd_id):
         log.debug("select projectset..")
 
         sql = """SELECT ps.*, t.status
-                 FROM projectset ps, tasks t
-                 WHERE ps.uuid = t.uuid and ps.uuid = '{}'""".format(crd_id)
+                 FROM {} ps, tasks t
+                 WHERE ps.uuid = t.uuid and ps.uuid = '{}'""".format(
+            typ, crd_id)
 
         cur = con.execute(sql)
 
@@ -244,11 +285,11 @@ def show_projectset(crd_id):
     return dyaml, env
 
 
-def delete_projectset(crd_id):
+def delete_projectset(typ, crd_id):
     log.debug("delete_projectset: crd_id %s", crd_id)
 
     ## if exist - silent return
-    _, e = show_projectset(crd_id)
+    _, e = show_projectset(typ, crd_id)
 
     if len(e) > 0 and e[0]["status"] != "FINISHED":
         raise Exception("There is one PR already exists")
@@ -259,4 +300,4 @@ def delete_projectset(crd_id):
                 status="PENDING",
                 date_type="date_begin")
 
-    app.q_push.put({"uuid": crd_id, "type": "projectset", "op": "DELETE"})
+    app.q_push.put({"uuid": crd_id, "type": typ, "op": "DELETE"})

@@ -10,20 +10,20 @@ from app.crds.projectsets import (
 )
 from app.crds.repos import get_envs
 
-projectset_page = Blueprint('projectset_page', __name__)
+projectset_template_page = Blueprint('projectset_template_page', __name__)
 
 
-@projectset_page.route('/', methods=['GET'])
+@projectset_template_page.route('/', methods=['GET'])
 @jwt_required(True)
 def projectset():
 
-    projectset_list = get_projectset("projectset")
+    projectset_list = get_projectset("projectset_template")
 
-    return render_template('projectset_page.html',
+    return render_template('projectset_template_page.html',
                            projectset_list=projectset_list)
 
 
-@projectset_page.route('/create', methods=['GET', 'POST'])
+@projectset_template_page.route('/create', methods=['GET', 'POST'])
 @jwt_required(True)
 def create():
 
@@ -36,7 +36,7 @@ def create():
         log.debug("create: data: %s", data)
 
         try:
-            create_projectset("projectset", repo, env, data, [])
+            create_projectset("projectset_template", repo, env, data, [])
 
         except Exception as e:
             return {"error": str(e)}
@@ -47,12 +47,12 @@ def create():
     envs = get_envs()
     envs = [{"name": k, "url": v["url"]} for k, v in envs.items()]
 
-    return render_template('modal_projectset_upsert_page.html',
+    return render_template('modal_projectset_template_upsert_page.html',
                            envs=envs,
                            data="")
 
 
-@projectset_page.route('/edit/<crd_id>', methods=['GET', 'POST'])
+@projectset_template_page.route('/edit/<crd_id>', methods=['GET', 'POST'])
 @jwt_required(True)
 def edit(crd_id):
 
@@ -63,27 +63,27 @@ def edit(crd_id):
         log.debug("create: data: %s", data)
 
         try:
-            update_projectset("projectset", crd_id, data)
+            update_projectset("projectset_template", crd_id, data)
         except Exception as e:
             return {"error": str(e)}
         # pass
         return {"status": "ok"}
 
     log.debug("read current state: %s", crd_id)
-    data, env = show_projectset("projectset", crd_id)
-    return render_template('modal_projectset_upsert_page.html',
+    data, env = show_projectset("projectset_template", crd_id)
+    return render_template('modal_projectset_template_upsert_page.html',
                            envs=env,
                            data=data)
 
 
-@projectset_page.route('/delete/<crd_id>', methods=['POST'])
+@projectset_template_page.route('/delete/<crd_id>', methods=['POST'])
 @jwt_required(True)
 def delete(crd_id):
 
     log.debug("delete: crd_id: %s", crd_id)
 
     try:
-        delete_projectset("projectset", crd_id)
+        delete_projectset("projectset_template", crd_id)
     except Exception as e:
         return {"error": str(e)}
     # pass

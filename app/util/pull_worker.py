@@ -58,12 +58,31 @@ def _parse_clone_dir(repo_url, repo_dir, myaml, remote_br):
 
         # template
         dirt = Path(template_dir)
+
         if dirt.exists():
             log.debug("exists")
 
             for t in os.listdir(template_dir):
+
+                if t.find("gitignore") >= 0:
+                    continue
+
                 # for t in glob.glob("."):
-                log.debug("read template: %s", t)
+                log.debug("read projectset: %s", t)
+
+                with open("{}/{}".format(template_dir, t),
+                          "r",
+                          encoding="utf-8") as f:
+                    data = f.read()
+
+                    log.debug("DATA: %s", data)
+
+                    create_projectset("projectset_template", repo_url, name,
+                                      data, True)
+
+        # update if remote_dr exists
+        update_projectset_status("projectset_template", repo_url, name,
+                                 remote_br)
 
         #
         # project set
@@ -91,10 +110,10 @@ def _parse_clone_dir(repo_url, repo_dir, myaml, remote_br):
 
                     log.debug("DATA: %s", data)
 
-                    create_projectset(repo_url, name, data, True)
+                    create_projectset("projectset", repo_url, name, data, True)
 
         # update if remote_dr exists
-        update_projectset_status(repo_url, name, remote_br)
+        update_projectset_status("projectset", repo_url, name, remote_br)
 
 
 def clone_pull_repo():

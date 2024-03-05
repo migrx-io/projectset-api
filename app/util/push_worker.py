@@ -11,7 +11,7 @@ from app.util.exec import run_shell
 from app.crds.repos import get_envs
 
 
-def show_projectset(db, crd_id):
+def show_projectset(typ, db, crd_id):
     log.debug("show_projectset: crd_id %s", crd_id)
 
     env = None
@@ -20,8 +20,8 @@ def show_projectset(db, crd_id):
 
         log.debug("select projectset..")
 
-        sql = """SELECT * FROM projectset
-                 WHERE uuid = '{}'""".format(crd_id)
+        sql = """SELECT * FROM {}
+                 WHERE uuid = '{}'""".format(typ, crd_id)
 
         cur = con.execute(sql)
 
@@ -163,17 +163,17 @@ def push(req):
     return "ok"
 
 
-def clear_tables(db, uid):
+def clear_tables(typ, db, uid):
 
     with db.get_conn() as con:
-        sql = """DELETE FROM projectset WHERE uuid = '{}';""".format(uid)
+        sql = """DELETE FROM {} WHERE uuid = '{}';""".format(typ, uid)
         con.execute(sql)
 
         sql = """DELETE FROM tasks WHERE uuid = '{}';""".format(uid)
         con.execute(sql)
 
 
-def is_cr_exists(parts):
+def is_cr_exists(typ, parts):
 
     env_list = get_envs()
     log.debug("env_list: %s", env_list)
@@ -197,7 +197,11 @@ def is_cr_exists(parts):
 
     log.debug("is_cr_exists: ydata: %s", ydata)
 
-    cr_dir = ydata.get("envs", {}).get(k, {}).get("projectset-crds")
+    if typ == "projectset":
+        cr_dir = ydata.get("envs", {}).get(k, {}).get("projectset-crds")
+    else:
+        cr_dir = ydata.get("envs", {}).get(k, {}).get("projectset-templates")
+
     log.debug("is_cr_exists: cr_dir: %s", cr_dir)
 
     cr_dir_path = "{}/{}".format(dir_name, cr_dir)
@@ -216,27 +220,82 @@ def process_state(db, data):
 
     if data["op"] in ["CREATE", "UPDATE"]:
 
-        # check if exists and eq
-        if data["type"] == "projectset":
+        ps = show_projectset(data["type"], db, data["uuid"])
 
-            ps = show_projectset(db, data["uuid"])
+        log.debug("CREATE: data: %s", ps)
 
-            log.debug("CREATE: data: %s", ps)
+        parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
 
-            parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
+        log.debug("parts: %s", parts)
 
-            log.debug("parts: %s", parts)
+        ok, cr_dir, cr, branch, v = is_cr_exists(data["type"], parts)
 
-            ok, cr_dir, cr, branch, v = is_cr_exists(parts)
+        log.debug("not found file: %s,  %s..creating..", ok, cr)
 
-            log.debug("not found file: %s,  %s..creating..", ok, cr)
+        if ok:
+            # if file exists - check if not changed
+            with open(f'{cr}', 'r', encoding="utf-8") as f:
+                if ps["data"] == f.read():
+                    log.debug("file is not changed - skip")
+                    return True
+        # set url
+        url_auth = "https://{}:{}@{}".format("projectset-api", v["token"],
+                                             v["url"][8:])
 
-            if ok:
-                # if file exists - check if not changed
-                with open(f'{cr}', 'r', encoding="utf-8") as f:
-                    if ps["data"] == f.read():
-                        log.debug("file is not changed - skip")
-                        return True
+        # add new branch
+        ok, err = run_shell("cd {} && git remote set-url origin {}".format(
+            cr_dir, url_auth))
+
+        log.debug("ok: %s, err: %s", ok, err)
+
+        # add new branch
+        ok, err = run_shell("cd {} && git checkout -b {}".format(
+            cr_dir, branch))
+
+        log.debug("ok: %s, err: %s", ok, err)
+
+        # create file
+        with open(f'{cr}', 'w+', encoding="utf-8") as f:
+            f.write(ps["data"])
+
+        ok, err = run_shell(
+            f"cd {cr_dir} && git add {cr} && git commit -m 'Create/update {branch}'"
+        )
+        log.debug("ok: %s, err: %s", ok, err)
+
+        # push to origin
+        ok, err = run_shell("cd {} && git push origin {}".format(
+            cr_dir, branch))
+        log.debug("ok: %s, err: %s", ok, err)
+
+        ok, err = run_shell("cd {} && git checkout {}".format(
+            cr_dir, v["branch"]))
+        log.debug("ok: %s, err: %s", ok, err)
+
+        # create MR/PR
+
+        url_parts = v["url"].split("/")
+
+        create_pull_request(v["token"], url_parts[3], url_parts[-1][:-4],
+                            f"Create/update {branch}",
+                            f"Create/update {branch}", f"{branch}",
+                            v["branch"])
+
+    elif data["op"] == "DELETE":
+
+        ps = show_projectset(data["type"], db, data["uuid"])
+
+        log.debug("DELETE: data: %s", ps)
+
+        parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
+
+        log.debug("parts: %s", parts)
+
+        ok, cr_dir, cr, branch, v = is_cr_exists(data["type"], parts)
+
+        if ok:
+            log.debug("found file: %s..deleting..", cr)
+
             # set url
             url_auth = "https://{}:{}@{}".format("projectset-api", v["token"],
                                                  v["url"][8:])
@@ -253,12 +312,9 @@ def process_state(db, data):
 
             log.debug("ok: %s, err: %s", ok, err)
 
-            # create file
-            with open(f'{cr}', 'w+', encoding="utf-8") as f:
-                f.write(ps["data"])
-
+            # delete file
             ok, err = run_shell(
-                f"cd {cr_dir} && git add {cr} && git commit -m 'Create/update {branch}'"
+                f"cd {cr_dir} && rm -rf {cr} && git rm {cr} && git commit -m 'Delete {branch}'"
             )
             log.debug("ok: %s, err: %s", ok, err)
 
@@ -276,71 +332,12 @@ def process_state(db, data):
             url_parts = v["url"].split("/")
 
             create_pull_request(v["token"], url_parts[3], url_parts[-1][:-4],
-                                f"Create/update {branch}",
-                                f"Create/update {branch}", f"{branch}",
-                                v["branch"])
+                                f"Delete {branch}", f"Delete {branch}",
+                                f"{branch}", v["branch"])
 
-    elif data["op"] == "DELETE":
-
-        if data["type"] == "projectset":
-
-            ps = show_projectset(db, data["uuid"])
-
-            log.debug("DELETE: data: %s", ps)
-
-            parts = base64.b64decode(data["uuid"]).decode("utf-8").split(",")
-
-            log.debug("parts: %s", parts)
-
-            ok, cr_dir, cr, branch, v = is_cr_exists(parts)
-
-            if ok:
-                log.debug("found file: %s..deleting..", cr)
-
-                # set url
-                url_auth = "https://{}:{}@{}".format("projectset-api",
-                                                     v["token"], v["url"][8:])
-
-                # add new branch
-                ok, err = run_shell(
-                    "cd {} && git remote set-url origin {}".format(
-                        cr_dir, url_auth))
-
-                log.debug("ok: %s, err: %s", ok, err)
-
-                # add new branch
-                ok, err = run_shell("cd {} && git checkout -b {}".format(
-                    cr_dir, branch))
-
-                log.debug("ok: %s, err: %s", ok, err)
-
-                # delete file
-                ok, err = run_shell(
-                    f"cd {cr_dir} && rm -rf {cr} && git rm {cr} && git commit -m 'Delete {branch}'"
-                )
-                log.debug("ok: %s, err: %s", ok, err)
-
-                # push to origin
-                ok, err = run_shell("cd {} && git push origin {}".format(
-                    cr_dir, branch))
-                log.debug("ok: %s, err: %s", ok, err)
-
-                ok, err = run_shell("cd {} && git checkout {}".format(
-                    cr_dir, v["branch"]))
-                log.debug("ok: %s, err: %s", ok, err)
-
-                # create MR/PR
-
-                url_parts = v["url"].split("/")
-
-                create_pull_request(v["token"], url_parts[3],
-                                    url_parts[-1][:-4], f"Delete {branch}",
-                                    f"Delete {branch}", f"{branch}",
-                                    v["branch"])
-
-            else:
-                log.debug("file not found. clear table")
-                clear_tables(db, data["uuid"])
+        else:
+            log.debug("file not found. clear table")
+            clear_tables(data["type"], db, data["uuid"])
 
     return True
 
