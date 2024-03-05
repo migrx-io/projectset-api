@@ -49,6 +49,7 @@ spec:
     spec:
       containers:
       - image: migrx/projectset-api:0.1.0
+        imagePullPolicy: Always
         name: projectset-api
         env:
         - name: APP_CONF
