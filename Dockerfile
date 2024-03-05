@@ -23,9 +23,6 @@ USER appuser
 
 RUN pip3 install -r requirements.txt
 
-# Enable ssh for vagrant
-EXPOSE 8082
-
 ENV PORT=8082 
 ENV LOGLEVEL=INFO
 ENV PYENV=~/.local/bin
