@@ -21,7 +21,7 @@ RUN chown -R appuser:appuser /app
 
 USER appuser
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # Enable ssh for vagrant
 EXPOSE 8082

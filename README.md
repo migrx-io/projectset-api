@@ -59,6 +59,17 @@ roles:
 
 ```
 
+### Deployment 
+
+```
+
+kubectl create ns projectset-api-system
+
+kubectl create secret generic app-conf --from-file=app.yaml=app.yaml --namespace projectset-api-system
+
+kubectl apply -f ./deploy/manifests.yaml
+  
+```
 
 
 ## Development
