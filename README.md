@@ -71,6 +71,16 @@ kubectl apply -f ./deploy/manifests.yaml
   
 ```
 
+proxy app
+
+```
+kubectl port-forward service/projectset-api-service -n projectset-api-system 8082:8082
+
+
+open http://localhost:8082
+
+```
+
 
 ## Development
 
