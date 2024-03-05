@@ -132,7 +132,8 @@ app.register_blueprint(repo_api, url_prefix='/api/v1/')
 app.register_blueprint(login_page, url_prefix='/')
 app.register_blueprint(repo_page, url_prefix='/repo')
 app.register_blueprint(projectset_page, url_prefix='/projectset')
-app.register_blueprint(projectset_template_page, url_prefix='/projectsettemplate')
+app.register_blueprint(projectset_template_page,
+                       url_prefix='/projectsettemplate')
 
 # Common errors
 app.register_error_handler(500, handle_internal_error)
