@@ -115,10 +115,11 @@ with app.app_context():
 
     # Git push worker
     q_push = queue.Queue()
-    pool = Pool(int(os.environ.get("PWORKERS", "1")), push, [db, q_push])
+    pool = Pool(int(os.environ.get("PWORKERS", "1")), push,
+                [db, q_push, q_pull])
     pool.start()
 
-    loop_unfinished_tasks([db, q_push, q_pull])
+    loop_unfinished_tasks([db, q_push])
 
 # Register blueprint(s)
 

@@ -99,7 +99,7 @@ def loop_unfinished_tasks(args):
 
 def _loop_unfinished_tasks(args):
 
-    db, q, q_pull = args[0], args[1], args[2]
+    db, q = args[0], args[1]
 
     while True:
 
@@ -113,10 +113,11 @@ def _loop_unfinished_tasks(args):
                 q.put({"uuid": t["uuid"], "type": t["type"], "op": t["op"]})
 
             # wait between push and pull
-            time.sleep(5)
+            # time.sleep(5)
 
+            q.put("pull")
             # trigger pull
-            q_pull.put("ping")
+            # q_pull.put("ping")
 
         except Exception as e:
             log.error("_loop_unfinished_tasks: %s", e)
@@ -126,11 +127,15 @@ def _loop_unfinished_tasks(args):
 
 def push(req):
 
-    db, q = req
+    db, q, q_pull = req
 
     # read message from q
 
     data = q.get()
+
+    if data == "pull":
+        q_pull.put("ping")
+        return "ok"
 
     log.debug("pull_git_worker: data: %s", data)
 
@@ -248,19 +253,13 @@ def process_state(db, data):
 
         log.debug("ok: %s, err: %s", ok, err)
 
-        # add new branch
-        ok, err = run_shell("cd {} && git checkout -b {}".format(
-            cr_dir, branch))
-
-        log.debug("ok: %s, err: %s", ok, err)
-
         # create file
         with open(f'{cr}', 'w+', encoding="utf-8") as f:
             f.write(ps["data"])
 
-        ok, err = run_shell(
-            f"cd {cr_dir} && git add {cr} && git commit -m 'Create/update {branch}'"
-        )
+        ok, err = run_shell(f"cd {cr_dir} && git checkout -b {branch} && \
+                    git add {cr} && \
+                    git commit -m 'Create/update {branch}'")
         log.debug("ok: %s, err: %s", ok, err)
 
         # push to origin
@@ -306,16 +305,11 @@ def process_state(db, data):
 
             log.debug("ok: %s, err: %s", ok, err)
 
-            # add new branch
-            ok, err = run_shell("cd {} && git checkout -b {}".format(
-                cr_dir, branch))
-
-            log.debug("ok: %s, err: %s", ok, err)
-
             # delete file
-            ok, err = run_shell(
-                f"cd {cr_dir} && rm -rf {cr} && git rm {cr} && git commit -m 'Delete {branch}'"
-            )
+            ok, err = run_shell(f"cd {cr_dir} && git checkout -b {branch} && \
+                        rm -rf {cr} && \
+                        git rm {cr} && \
+                        git commit -m 'Delete {branch}'")
             log.debug("ok: %s, err: %s", ok, err)
 
             # push to origin

@@ -23,7 +23,7 @@
               <a class="nav-link" href="{{ url_for('projectset_page.projectset') }}">ProjectSet CRs</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('projectset_template_page.projectset') }}">ProjectSetTemplates CRs</a>
+              <a class="nav-link" href="{{ url_for('projectset_template_page.projectset') }}">ProjectSetTemplate CRs</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('repo_page.repo') }}">Enviroments</a>
@@ -184,7 +184,7 @@
                 var url = "/projectset/delete/" + btoa(crd_id)
 
                 if ($("table").hasClass("projectsettemplate")){
-                    url = "/projectsettemplate/edit/" + btoa(crd_id)
+                    url = "/projectsettemplate/delete/" + btoa(crd_id)
                 }
 
                 $.post(url, function (data) {

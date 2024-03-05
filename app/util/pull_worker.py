@@ -149,8 +149,9 @@ def clone_pull_repo():
             log.debug("ok: %s, err: %s", ok, err)
 
         # checkout to main before pull
-        ok, err = run_shell("cd {} && git checkout {} && git pull".format(
-            repo_dir, v["branch"]))
+        ok, err = run_shell(
+            "cd {} && git checkout {} && git checkout -- * && git pull".format(
+                repo_dir, v["branch"]))
         log.debug("ok: %s, err: %s", ok, err)
 
         # update remote and local branches

@@ -176,6 +176,7 @@ def update_projectset_status(typ, repo, env, remote_br):
 
         uuids = []
         all_uuids = []
+
         for p in ps:
 
             log.debug("p: %s", p)
@@ -234,7 +235,7 @@ def update_projectset(typ, crd_id, ydata):
 
             sql = """UPDATE projectset_template SET data = '{}',
                                         labels = '{}',
-                                        annotations = '{}',
+                                        annotations = '{}'
                     WHERE uuid = '{}'
                                 """.format(
                 ydata,
@@ -243,7 +244,7 @@ def update_projectset(typ, crd_id, ydata):
                                                {}).get("annotations"))),
                 crd_id)
 
-        log.debug("update sql: %s", sql)
+        log.info("update sql: %s", sql)
 
         con.execute(sql)
 
@@ -286,7 +287,7 @@ def show_projectset(typ, crd_id):
 
 
 def delete_projectset(typ, crd_id):
-    log.debug("delete_projectset: crd_id %s", crd_id)
+    log.info("delete_projectset: crd_id %s", crd_id)
 
     ## if exist - silent return
     _, e = show_projectset(typ, crd_id)
