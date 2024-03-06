@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# predifine git config
+git config --global user.email "${GIT_EMAIL}"
+git config --global user.name "${GIT_USER}"
+
+# start app
 HTTP_OPTS="--http 0.0.0.0:${PORT}"
 
 SSL_CRT="/etc/ssl/projectset-api/projectset-api.crt"

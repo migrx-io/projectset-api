@@ -54,6 +54,12 @@ spec:
         env:
         - name: APP_CONF
           value: "/app/secret/app.yaml"
+        - name: LOGLEVEL
+          value: DEBUG
+        - name: GIT_EMAIL
+          value: "projectset-api@migrx.io"
+        - name: GIT_USER
+          value: "projectset-api"
         ports:
         - containerPort: 8082
           name: http
