@@ -64,8 +64,6 @@ roles:
       - all
     (.*)/projectset/create/?$:
       - all
-    (.*)/projectsettemplate/?$:
-      - all
     (.*)/repo/?$:
       - all
     (.*)/logout/?$:
