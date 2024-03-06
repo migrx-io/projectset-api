@@ -8,6 +8,7 @@ from flask import request, jsonify, redirect, url_for
 from werkzeug.datastructures import Headers
 from app.util.ldapx import ldap_auth
 import yaml
+import re
 
 
 def authenticate(username, password):
@@ -51,19 +52,42 @@ def auth_call(email, password):
     return True, data
 
 
+def check_spec(data, allow):
+
+    log.info("check_spec: data: %s, allow: %s", data, allow)
+
+    if allow is not None and allow != ["all"] and data is not None:
+        log.info("allow: %s", allow)
+
+        # check attributes
+        for k in data.get("spec", {}).keys():
+            log.info("spec attrs: %s not in allow: %s", k, allow)
+            if k not in allow:
+                return False, "Permission denied attr: {}, allow attribute: {}".format(k, allow)
+
+    return True, None
+
+
 def check_permissions(login, claims, req):
 
     # check user permission
 
     log.info("check_permissions: login: %s / claims: %s / req: %s", login,
-              claims, req)
-    
+             claims, req)
 
-    log.info("check_permissions: path: %s, data: %s", req.path, req.data)
+    log.info("check_permissions: path: %s, data: %s form: %s", req.path,
+             req.data, req.form)
+
+    ydata = req.form.get("data", None)
+    if ydata is None:
+        ydata = req.data.decode("utf-8")
+
+    ydata = yaml.safe_load(ydata)
+
+    log.info("received data: %s", ydata)
 
     roles = []
-    with open(os.environ.get("APP_CONF", "app.yaml"),
-              'r',
+    with open(os.environ.get("APP_CONF", "app.yaml"), 'r',
               encoding="utf-8") as file:
 
         data = yaml.safe_load(file)
@@ -75,21 +99,23 @@ def check_permissions(login, claims, req):
     for g in claims["groups"]:
 
         verbs = roles.get(g, {})
-       
+
         log.info("verbs: %s", verbs)
+
         for k, v in verbs.items():
 
-            if req.path.find(k) >= 0:
+            log.info("check verb: %s, %s", req.path, k)
 
-                data = req.data.decode("utf-8")
-                
+            if re.search(r'{}'.format(k), req.path) is not None:
                 log.info("data: %s", data)
+                log.info("ydata: %s", ydata)
 
-                return True, None
+                log.info("data: g %s -> %s", g, k)
+                allow = v
 
+                return check_spec(ydata, allow)
 
     return False, "Permission denied"
-
 
 
 def jwt_required(page=False):

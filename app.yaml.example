@@ -3,20 +3,20 @@ envs:
     description: Dev repo for dev/preprod clusters
     url: https://github.com/migrx-io/projectset-crds.git
     branch: main
-    token: ghp_OsaHO...
+    token: <token>
     conf_file: projectsets.yaml
   prod-ocp-cluster:
     description: Prod repo for production clusters
     url: https://github.com/migrx-io/projectset-crds.git
     branch: main  
-    token: ghp_OsaHOo....
+    token: <token>
     conf_file: projectsets.yaml
 
 auth:
   ldap:
     url: "ldap://127.0.0.1:389"
     bindDN: "cn=admin,dc=example,dc=org"
-    bindPW: adm...
+    bindPW: <passwd>
 
     userSearch:
       baseDN: "ou=people,dc=example,dc=org"
@@ -34,40 +34,36 @@ auth:
 
 roles:
   user:
-    /projectset:
+    (.*)/projectset/?$:
       - all
-    /projectset/edit:
+    (.*)/projectset/edit/:
       - annotations
-    /projectset/delete:
+    (.*)/projectset/delete/:
       - all
-    /projectset/create:
+    (.*)/projectset/create/?$:
       - annotations
-    /repo/:
+    (.*)/repo/?$:
       - all
-    /logout:
+    (.*)/logout/?$:
       - all
   admin:
-    /projectset:
+    (.*)/projectset/?$:
       - all
-    /projectset/edit:
+    (.*)/projectset/edit/:
       - annotations
-      - labels
-    /projectset/delete:
+    (.*)/projectset/delete/:
       - all
-    /projectset/create:
+    (.*)/projectset/create:
       - annotations
-      - labels
-    /projectsettemplate:
+    (.*)/repo/?$:
       - all
-    /projectsettemplate/edit:
+    (.*)/logout/?$:
+      - all
+    (.*)/projectsettemplate/?$:
+      - all
+    (.*)/projectsettemplate/edit/:
       - annotations
-      - labels
-    /projectsettemplate/delete:
+    (.*)/projectsettemplate/delete/:
       - all
-    /projectsettemplate/create:
+    (.*)/projectsettemplate/create?/$:
       - annotations
-      - labels
-    /repo:
-      - all
-    /logout:
-      - all

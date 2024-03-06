@@ -136,7 +136,9 @@
                             } else {
                                 $("#modal-error-text").text("ERROR: " + data.error);
                             }
-                        })
+                        }).fail(function(xhr, status, error) {
+                                alert("Error: " + xhr.responseText);
+                        });
                     });
                 })
 
@@ -162,7 +164,10 @@
                             } else {
                                 $("#modal-error-text").text("ERROR: " + data.error);
                             }
-                        })
+                        }).fail(function(xhr, status, error) {
+                                alert("Error: " + xhr.responseText);
+                        });
+
                     });
                 })
         });
