@@ -7,6 +7,7 @@ from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
 from flask import request, jsonify, redirect, url_for
 from werkzeug.datastructures import Headers
 from app.util.ldapx import ldap_auth
+import yaml
 
 
 def authenticate(username, password):
@@ -54,12 +55,41 @@ def check_permissions(login, claims, req):
 
     # check user permission
 
-    log.debug("check_permissions: login: %s / claims: %s / req: %s", login,
+    log.info("check_permissions: login: %s / claims: %s / req: %s", login,
               claims, req)
+    
 
-    # retunr False, data
+    log.info("check_permissions: path: %s, data: %s", req.path, req.data)
 
-    return True, None
+    roles = []
+    with open(os.environ.get("APP_CONF", "app.yaml"),
+              'r',
+              encoding="utf-8") as file:
+
+        data = yaml.safe_load(file)
+
+        log.debug("get_envs: data: %s", data)
+
+        roles = data.get("roles", {})
+
+    for g in claims["groups"]:
+
+        verbs = roles.get(g, {})
+       
+        log.info("verbs: %s", verbs)
+        for k, v in verbs.items():
+
+            if req.path.find(k) >= 0:
+
+                data = req.data.decode("utf-8")
+                
+                log.info("data: %s", data)
+
+                return True, None
+
+
+    return False, "Permission denied"
+
 
 
 def jwt_required(page=False):
