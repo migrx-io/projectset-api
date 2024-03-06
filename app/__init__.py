@@ -1,4 +1,5 @@
 from gevent import monkey
+
 monkey.patch_all(subprocess=False)
 
 import logging as log
@@ -28,6 +29,7 @@ from app.webapp.projectset_template_page import projectset_template_page
 from app.util.pool import Pool
 from app.util.push_worker import push, loop_unfinished_tasks
 from app.util.pull_worker import pull
+from app.util.ldapx import sync_ldap
 
 from app.util.db import DB
 
@@ -102,10 +104,8 @@ with app.app_context():
     jwt = JWTManager(app)
     db = DB()
 
-    # Gateway worker
-    # q = queue.Queue()
-    # pool = Pool(int(os.environ.get("PWORKERS", "1")), run_worker, {})
-    # pool.start()
+    # LDAP sync
+    sync_ldap([db])
 
     # Git pull worker
     q_pull = queue.Queue()

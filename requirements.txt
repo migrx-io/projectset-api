@@ -5,3 +5,4 @@ gevent==24.2.1
 uWSGI==2.0.24
 yapf==0.32.0
 pylint==3.0.3
+python-ldap==3.4.4

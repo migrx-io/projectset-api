@@ -1,5 +1,18 @@
 # SCHEMA
 
+CREATE_USERS = """CREATE TABLE IF NOT EXISTS
+                                            users(
+                                                  id text,
+                                                  username text,
+                                                  email text,
+                                                  groups text
+                                                  )
+                """
+
+CREATE_USERS_IDX = """
+    CREATE UNIQUE INDEX IF NOT EXISTS users_id ON users(username); 
+               """
+
 CREATE_TASKS = """CREATE TABLE IF NOT EXISTS
                                             tasks(
                                                   uuid text,

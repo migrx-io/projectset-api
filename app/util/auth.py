@@ -6,13 +6,14 @@ from flask_jwt_extended import (verify_jwt_in_request, get_jwt_identity,
                                 get_jwt, create_access_token)
 from flask import request, jsonify, redirect, url_for
 from werkzeug.datastructures import Headers
+from app.util.ldapx import ldap_auth
 
 
 def authenticate(username, password):
 
     ok, data = auth_call(username, password)
 
-    log.debug("auth_call: status: %s / text %s", ok, data)
+    log.info("auth_call: status: %s / text %s", ok, data)
 
     if not ok:
         return False, data
@@ -39,7 +40,14 @@ def auth_call(email, password):
 
     # Auth logic here
 
-    return True, {"session": ""}
+    ok, data = ldap_auth(email, password)
+
+    log.info("ldap_auth: ok: %s, data: %s", ok, data)
+
+    if not ok:
+        return False, data
+
+    return True, data
 
 
 def check_permissions(login, claims, req):

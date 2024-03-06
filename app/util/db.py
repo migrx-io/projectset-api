@@ -1,5 +1,7 @@
 import sqlite3
 from app.util.sql import (
+    CREATE_USERS,
+    CREATE_USERS_IDX,
     CREATE_TASKS,
     CREATE_PROJECTSET,
     CREATE_PROJECTSET_TEMPLATE,
@@ -37,10 +39,13 @@ class DB:
 
         with self.db as con:
             cur = con.cursor()
+
+            cur.execute(CREATE_USERS)
             cur.execute(CREATE_TASKS)
             cur.execute(CREATE_PROJECTSET)
             cur.execute(CREATE_PROJECTSET_TEMPLATE)
 
+            cur.execute(CREATE_USERS_IDX)
             cur.execute(CREATE_TASKS_IDX)
             cur.execute(CREATE_PROJECTSET_IDX)
             cur.execute(CREATE_PROJECTSET_TEMPLATE_IDX)
