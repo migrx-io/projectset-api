@@ -1,0 +1,73 @@
+envs:
+  test-ocp-cluster:
+    description: Dev repo for dev/preprod clusters
+    url: https://github.com/migrx-io/projectset-crds.git
+    branch: main
+    token: ghp_OsaHO...
+    conf_file: projectsets.yaml
+  prod-ocp-cluster:
+    description: Prod repo for production clusters
+    url: https://github.com/migrx-io/projectset-crds.git
+    branch: main  
+    token: ghp_OsaHOo....
+    conf_file: projectsets.yaml
+
+auth:
+  ldap:
+    url: "ldap://127.0.0.1:389"
+    bindDN: "cn=admin,dc=example,dc=org"
+    bindPW: adm...
+
+    userSearch:
+      baseDN: "ou=people,dc=example,dc=org"
+      filter: "(objectclass=inetOrgPerson)"
+      user_map:
+        username: "mail"
+        email: "mail"
+
+    groupSearch:                                                            
+      baseDN: "ou=groups,dc=example,dc=org"
+      filter: "(objectClass=groupOfNames)"
+      group_map:
+        admins: "admin"
+        developers: "user"
+
+roles:
+  user:
+    /projectset:
+      - all
+    /projectset/edit:
+      - annotations
+    /projectset/delete:
+      - all
+    /projectset/create:
+      - annotations
+    /repo/:
+      - all
+    /logout:
+      - all
+  admin:
+    /projectset:
+      - all
+    /projectset/edit:
+      - annotations
+      - labels
+    /projectset/delete:
+      - all
+    /projectset/create:
+      - annotations
+      - labels
+    /projectsettemplate:
+      - all
+    /projectsettemplate/edit:
+      - annotations
+      - labels
+    /projectsettemplate/delete:
+      - all
+    /projectsettemplate/create:
+      - annotations
+      - labels
+    /repo:
+      - all
+    /logout:
+      - all
