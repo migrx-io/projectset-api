@@ -15,7 +15,7 @@ def authenticate(username, password):
 
     ok, data = auth_call(username, password)
 
-    log.info("auth_call: status: %s / text %s", ok, data)
+    log.debug("auth_call: status: %s / text %s", ok, data)
 
     if not ok:
         return False, data
@@ -44,7 +44,7 @@ def auth_call(email, password):
 
     ok, data = ldap_auth(email, password)
 
-    log.info("ldap_auth: ok: %s, data: %s", ok, data)
+    log.debug("ldap_auth: ok: %s, data: %s", ok, data)
 
     if not ok:
         return False, data
@@ -54,16 +54,17 @@ def auth_call(email, password):
 
 def check_spec(data, allow):
 
-    log.info("check_spec: data: %s, allow: %s", data, allow)
+    log.debug("check_spec: data: %s, allow: %s", data, allow)
 
     if allow is not None and allow != ["all"] and data is not None:
-        log.info("allow: %s", allow)
+        log.debug("allow: %s", allow)
 
         # check attributes
         for k in data.get("spec", {}).keys():
-            log.info("spec attrs: %s not in allow: %s", k, allow)
+            log.debug("spec attrs: %s not in allow: %s", k, allow)
             if k not in allow:
-                return False, "Permission denied attr: {}, allow attribute: {}".format(k, allow)
+                return False, "Permission denied attr: {}, allow attribute: {}".format(
+                    k, allow)
 
     return True, None
 
@@ -72,11 +73,11 @@ def check_permissions(login, claims, req):
 
     # check user permission
 
-    log.info("check_permissions: login: %s / claims: %s / req: %s", login,
-             claims, req)
+    log.debug("check_permissions: login: %s / claims: %s / req: %s", login,
+              claims, req)
 
-    log.info("check_permissions: path: %s, data: %s form: %s", req.path,
-             req.data, req.form)
+    log.debug("check_permissions: path: %s, data: %s form: %s", req.path,
+              req.data, req.form)
 
     ydata = req.form.get("data", None)
     if ydata is None:
@@ -84,7 +85,7 @@ def check_permissions(login, claims, req):
 
     ydata = yaml.safe_load(ydata)
 
-    log.info("received data: %s", ydata)
+    log.debug("received data: %s", ydata)
 
     roles = []
     with open(os.environ.get("APP_CONF", "app.yaml"), 'r',
@@ -100,17 +101,17 @@ def check_permissions(login, claims, req):
 
         verbs = roles.get(g, {})
 
-        log.info("verbs: %s", verbs)
+        log.debug("verbs: %s", verbs)
 
         for k, v in verbs.items():
 
-            log.info("check verb: %s, %s", req.path, k)
+            log.debug("check verb: %s, %s", req.path, k)
 
             if re.search(r'{}'.format(k), req.path) is not None:
-                log.info("data: %s", data)
-                log.info("ydata: %s", ydata)
+                log.debug("data: %s", data)
+                log.debug("ydata: %s", ydata)
 
-                log.info("data: g %s -> %s", g, k)
+                log.debug("data: g %s -> %s", g, k)
                 allow = v
 
                 return check_spec(ydata, allow)

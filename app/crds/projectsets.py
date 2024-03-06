@@ -244,7 +244,7 @@ def update_projectset(typ, crd_id, ydata):
                                                {}).get("annotations"))),
                 crd_id)
 
-        log.info("update sql: %s", sql)
+        log.debug("update sql: %s", sql)
 
         con.execute(sql)
 
@@ -287,7 +287,7 @@ def show_projectset(typ, crd_id):
 
 
 def delete_projectset(typ, crd_id):
-    log.info("delete_projectset: crd_id %s", crd_id)
+    log.debug("delete_projectset: crd_id %s", crd_id)
 
     ## if exist - silent return
     _, e = show_projectset(typ, crd_id)

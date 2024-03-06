@@ -16,7 +16,7 @@ auth:
   ldap:
     url: "ldap://127.0.0.1:389"
     bindDN: "cn=admin,dc=example,dc=org"
-    bindPW: <passwd>
+    bindPW: <password>
 
     userSearch:
       baseDN: "ou=people,dc=example,dc=org"
@@ -38,23 +38,38 @@ roles:
       - all
     (.*)/projectset/edit/:
       - annotations
+      - labels
+      - namespace
+      - template
     (.*)/projectset/delete/:
       - all
     (.*)/projectset/create/?$:
       - annotations
+      - labels
+      - namespace
+      - template
+    (.*)/projectsettemplate/?$:
+      - all
     (.*)/repo/?$:
       - all
     (.*)/logout/?$:
       - all
+
   admin:
     (.*)/projectset/?$:
       - all
     (.*)/projectset/edit/:
-      - annotations
+      - all
     (.*)/projectset/delete/:
       - all
-    (.*)/projectset/create:
-      - annotations
+    (.*)/projectset/create/?$:
+      - all
+    (.*)/projectsettemplate/?$:
+      - all
+    (.*)/repo/?$:
+      - all
+    (.*)/logout/?$:
+      - all
     (.*)/repo/?$:
       - all
     (.*)/logout/?$:
@@ -62,8 +77,8 @@ roles:
     (.*)/projectsettemplate/?$:
       - all
     (.*)/projectsettemplate/edit/:
-      - annotations
+      - all
     (.*)/projectsettemplate/delete/:
       - all
     (.*)/projectsettemplate/create?/$:
-      - annotations
+      - all
