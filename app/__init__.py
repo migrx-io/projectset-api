@@ -138,4 +138,3 @@ app.register_blueprint(projectset_template_page,
 # Common errors
 app.register_error_handler(500, handle_internal_error)
 app.register_error_handler(403, handle_internal_error)
-

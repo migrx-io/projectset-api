@@ -38,7 +38,8 @@ def auth_call(email, password):
     # if user admin - all perms
     if email == "admin" and password == os.environ.get("ADMIN_PASSWD", "") and \
             os.environ.get("ADMIN_DISABLE", "n") == "n":
-        return True, {"session": ""}
+
+        return True, {"groups": ["admins"]}
 
     # Auth logic here
 

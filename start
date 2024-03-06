@@ -1,8 +1,15 @@
 #!/bin/bash
 
 # predifine git config
-git config --global user.email "${GIT_EMAIL}"
-git config --global user.name "${GIT_USER}"
+if [ "x" != "x$GIT_EMAIL" ]                                                     
+then 
+    git config --global user.email "${GIT_EMAIL}"
+fi 
+
+if [ "x" != "x$GIT_USER" ]                                                     
+then 
+    git config --global user.name "${GIT_USER}"
+fi 
 
 # start app
 HTTP_OPTS="--http 0.0.0.0:${PORT}"

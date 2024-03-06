@@ -96,3 +96,11 @@ LOGLEVEL=DEBUG PYENV=/opt/homebrew/bin/ make run
 ```
 LOGLEVEL=DEBUG PYENV=/opt/homebrew/bin/ make tests
 ```
+
+### Run proxy ldap
+
+```
+sudo kubectl port-forward service/openldap -n ldap 389:389
+```
+
+

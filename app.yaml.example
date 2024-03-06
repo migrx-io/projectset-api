@@ -80,5 +80,5 @@ roles:
       - all
     (.*)/projectsettemplate/delete/:
       - all
-    (.*)/projectsettemplate/create?/$:
+    (.*)/projectsettemplate/create/?$:
       - all
