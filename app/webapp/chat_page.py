@@ -3,7 +3,6 @@ from flask import Blueprint, render_template, request, jsonify
 from app.util.auth import jwt_required
 import json
 
-
 chat_page = Blueprint('chat_page', __name__)
 
 
@@ -23,7 +22,6 @@ def get_data():
 
     data = json.loads(request.data)
 
-
     text = data.get('data')
     user_input = text
 
@@ -38,9 +36,8 @@ def get_data():
 
         output = "response.."
 
-        return jsonify({"response":True, "message": output}), 200
+        return jsonify({"response": True, "message": output}), 200
 
     except Exception as e:
         log.error(e)
-        return jsonify({"message": f'Error: {str(e)}', "response":False}), 200
-
+        return jsonify({"message": f'Error: {str(e)}', "response": False}), 200
