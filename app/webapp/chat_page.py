@@ -28,9 +28,9 @@ def get_data():
 
     user_input = data.get('data')
 
-    log.debug("user_input: %s", user_input)
-
     login = get_jwt_identity()
+
+    log.info("login: %s, user_input: %s", login, user_input)
 
     try:
 

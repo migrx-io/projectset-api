@@ -33,8 +33,12 @@ def chatcompletion(client, system, chat_history):
 
 def chat_call(login, user_input):
 
+    log.info("app.chat_history: %s", app.chat_history)
+
     chat_history = app.chat_history.get(login, [])
     client = app.openai_client
+
+    log.info("chat_history: %s", chat_history)
 
     system = ""
     with open(os.environ.get("PROMT", "promt.txt"), encoding="utf-8") as f:
@@ -46,5 +50,7 @@ def chat_call(login, user_input):
     chat_history.append(in_msg)
     output = chatcompletion(client, system, chat_history)
     chat_history.append({"role": "assistant", "content": output})
+
+    app.chat_history[login] = chat_history
 
     return output
