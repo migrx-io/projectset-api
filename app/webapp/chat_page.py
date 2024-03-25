@@ -1,7 +1,11 @@
 import logging as log
 from flask import Blueprint, render_template, request, jsonify
 from app.util.auth import jwt_required
+from app.crds.chat import (
+    chat_call, )
+
 import json
+from flask_jwt_extended import get_jwt_identity
 
 chat_page = Blueprint('chat_page', __name__)
 
@@ -22,19 +26,15 @@ def get_data():
 
     data = json.loads(request.data)
 
-    text = data.get('data')
-    user_input = text
+    user_input = data.get('data')
 
     log.debug("user_input: %s", user_input)
 
+    login = get_jwt_identity()
+
     try:
 
-        # conversation = ConversationChain(llm=llm,memory=memory)
-        # output = conversation.predict(input=user_input)
-
-        # memory.save_context({"input": user_input}, {"output": output})
-
-        output = "response.."
+        output = chat_call(login, user_input)
 
         return jsonify({"response": True, "message": output}), 200
 

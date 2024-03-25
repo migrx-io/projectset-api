@@ -33,6 +33,7 @@ from app.util.pull_worker import pull
 from app.util.ldapx import sync_ldap
 
 from app.util.db import DB
+from openai import OpenAI
 
 app = Flask(
     __name__,
@@ -120,6 +121,10 @@ with app.app_context():
     pool.start()
 
     loop_unfinished_tasks([db, q_push])
+
+    # Chat bot
+    chat_history = {}
+    openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "none"))
 
 # Register blueprint(s)
 

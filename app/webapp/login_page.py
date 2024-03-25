@@ -1,7 +1,7 @@
 from flask import (Blueprint, render_template, request, redirect, url_for,
                    make_response)
 
-from flask_jwt_extended import get_jwt, decode_token
+from flask_jwt_extended import get_jwt, verify_jwt_in_request, decode_token
 import yaml
 
 import logging as log
@@ -44,6 +44,7 @@ def login():
         if access_token is None:
             return render_template('login_page.html', error=error)
 
+        verify_jwt_in_request()
         if is_only_chat(get_jwt()):
             return redirect(url_for('chat_page.chat'))
 
