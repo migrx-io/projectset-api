@@ -123,7 +123,6 @@ with app.app_context():
     loop_unfinished_tasks([db, q_push])
 
     # Chat bot
-    chat_history = {}
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "none"))
 
 # Register blueprint(s)

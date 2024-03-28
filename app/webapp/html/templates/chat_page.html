@@ -160,56 +160,24 @@
         }
         scrollToBottom()
 
-        document.getElementById("userinputform").addEventListener("submit", function (event) {
-            event.preventDefault();
-            formsubmitted();
-        });
+        function printResponse(json){
 
-
-        // sending request to python server
-        const formsubmitted = async () => {
             let userinput = document.getElementById('userinput').value
-            let sendbtn = document.getElementById('sendbtn')
             let userinputarea = document.getElementById('userinput')
             let upperdiv = document.getElementById('upperid')
-           
-
-            upperdiv.innerHTML = upperdiv.innerHTML + `<div class="message">
-                <div class="usermessagediv">
-                        <div class="usermessage">
-                            ${userinput}
-                        </div>
-                </div>
-            </div>`
-            sendbtn.disabled = true
-            userinputarea.disabled = true
-            scrollToBottom()
-            document.getElementById('userinput').value = ""
-            document.getElementById('userinput').placeholder = "Wait . . ."
-
-            var url = window.location.href + "data"
-
-            const response = await fetch(url, {
-                method: 'POST',
-                body: JSON.stringify({ data: userinput })
-
-            });
-
-            let json = await response.json();
-
-            document.getElementById('userinput').placeholder = "Your message..."
 
             if (json.response) {
                 let message = json.message
                 message = message.toString()
       
                 upperdiv.innerHTML = upperdiv.innerHTML + `<div class="message">
-                <div class="appmessagediv">
-                    <div class="appmessage" id="temp">
-                        
+                    <div class="appmessagediv">
+                        <div class="appmessage" id="temp">
+                            
+                        </div>
                     </div>
-                </div>
-            </div>`
+                </div>`
+
                 let temp = document.getElementById('temp')
                 let index = 0
                 function displayNextLetter() {
@@ -251,7 +219,55 @@
 
             scrollToBottom()
 
-        } 
+        }
+
+        document.getElementById("userinputform").addEventListener("submit", function (event) {
+            event.preventDefault();
+            formsubmitted();
+        });
+
+
+        // sending request to python server
+        const formsubmitted = async () => {
+            let userinput = document.getElementById('userinput').value
+            let sendbtn = document.getElementById('sendbtn')
+            let userinputarea = document.getElementById('userinput')
+            let upperdiv = document.getElementById('upperid')
+
+            upperdiv.innerHTML = upperdiv.innerHTML + `<div class="message">
+                <div class="usermessagediv">
+                        <div class="usermessage">
+                            ${userinput}
+                        </div>
+                </div>
+            </div>`
+
+            sendbtn.disabled = true
+            userinputarea.disabled = true
+            scrollToBottom()
+            document.getElementById('userinput').value = ""
+            document.getElementById('userinput').placeholder = "Wait . . ."
+
+            var url = window.location.href + "data/{{ session }}"
+
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ data: userinput })
+
+            });
+
+            let json = await response.json();
+    
+            printResponse(json);
+
+            document.getElementById('userinput').placeholder = "Your message..."
+
+        }
+
+        // initial message
+        printResponse({"message": "{{ first_msg }}", "response": true});
+
+
     </script>
 </body>
 
