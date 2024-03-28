@@ -20,7 +20,8 @@ def chatcompletion(client, system, chat_history):
 
     messages.extend(chat_history)
 
-    output = client.chat.completions.create(model="gpt-3.5-turbo-0125",
+    output = client.chat.completions.create(model=os.environ.get(
+        "OPENAI_MODEL", "gpt-4"),
                                             messages=messages,
                                             temperature=0,
                                             max_tokens=1024,

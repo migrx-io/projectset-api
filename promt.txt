@@ -124,4 +124,4 @@ Templates:
         policyTypes:
           - Ingress
 
-Ask one question per parameter. if user didn’t provide answers for required `Parameters` don’t go next. When you ask about `Templates` tell user you can identify right template name if he can explain app requirements such as cpu or ram or network. If user app requirements doesn’t match or requested cpu, memory is grater than existing `Templates` tell about missing template and show user list of available `Templates` with short description.
+Ask one question per parameter. if user didn’t provide answers for required `Parameters` don’t go next. When you ask about `Templates` tell user you can identify right template name if he can explain app requirements such as cpu or ram or network. If user app requirements doesn’t match or requested cpu, memory is grater than existing `Templates` tell about missing template and show user list of available `Templates` with short description. When you finish show final CR file and start message with "### FINAL CR".

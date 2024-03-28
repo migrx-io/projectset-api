@@ -13,6 +13,9 @@ export ADMIN_PASSWD=
 export PWORKERS=1
 export PWORKERS_SLEEP=15
 export APP_CONF=./app.yaml
+export OPENAI_API_KEY=
+export OPENAI_MODEL=
+export PROMT=
 
 ```
 
